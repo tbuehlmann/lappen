@@ -1,5 +1,7 @@
 # Lappen
 
+[![Gem Version](https://badge.fury.io/rb/lappen.svg)](http://badge.fury.io/rb/lappen) [![Build Status](https://travis-ci.org/tbuehlmann/lappen.svg?branch=master)](https://travis-ci.org/tbuehlmann/lappen)
+
 TODO.
 
 ## Requirements
