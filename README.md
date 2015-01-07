@@ -84,7 +84,7 @@ end
 
 … and add the Filter to your Lappen:
 
-```
+```ruby
 class ProductLappen < Lappen::FilterStack
   use Lappen::Filters::Kaminari
   use Lappen::Filters::Orderer
@@ -94,7 +94,7 @@ end
 
 Any further arguments are injected into the Filter's constructor:
 
-```
+```ruby
   use MyFilter, :foo, :bar
 ```
 
