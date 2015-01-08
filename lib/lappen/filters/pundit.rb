@@ -2,11 +2,10 @@ module Lappen
   module Filters
     class Pundit < Filter
       def perform(scope, params = {})
-        pundit_scope = pundit_scope(scope)
+        resolved_policy_scope = resolved_policy_scope(scope)
 
-        if pundit_scope
-          scoped_scope = pundit_scope.new(pundit_user, scope).resolve
-          stack.perform(scoped_scope, params)
+        if resolved_policy_scope
+          stack.perform(resolved_policy_scope, params)
         else
           stack.perform(scope, params)
         end
@@ -14,8 +13,14 @@ module Lappen
 
       private
 
-      def pundit_scope(scope)
-        @pundit_scope ||= ::Pundit::PolicyFinder.new(scope).scope
+      def resolved_policy_scope(scope)
+        policy_scope = ::Pundit::PolicyFinder.new(scope).scope
+
+        if policy_scope
+          policy_scope.new(pundit_user, scope).resolve
+        else
+          nil
+        end
       end
 
       def pundit_user
