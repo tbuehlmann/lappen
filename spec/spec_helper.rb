@@ -2,6 +2,8 @@ require 'rspec'
 require 'pry'
 require 'lappen'
 
+Dir['./spec/support/**/*.rb'].sort.each { |file| require file }
+
 RSpec.configure do |config|
   config.filter_run :focus
   config.run_all_when_everything_filtered = true

@@ -20,7 +20,7 @@ describe Lappen::Filters::Pundit do
         subject.perform(scope, params)
       end
 
-      it_behaves_like 'filter that calls the stack'
+      it_behaves_like 'a filter that calls the stack'
     end
 
     context 'without a corresponding Pundit scope' do
@@ -33,7 +33,7 @@ describe Lappen::Filters::Pundit do
         subject.perform(scope, params)
       end
 
-      it_behaves_like 'filter that calls the stack'
+      it_behaves_like 'a filter that calls the stack'
     end
   end
 end
