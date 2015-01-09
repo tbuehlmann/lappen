@@ -38,7 +38,19 @@ end
 
 This Lappen will use the Filters `Kaminari` and `Orderer` (in exactly this order).
 
-A suitable location to place Lappens is `app/lappens`. This will also be the default for Lappens created via the generators later on.
+A suitable location to place Lappens is `app/lappens`. This is also the default location for Lappens created via the generators.
+
+If you want to create an `ApplicationLappen` from which all Lappens can inherit, use the `install` generator:
+
+```sh
+$ bin/rails generate lappen:install
+```
+
+TODO: If you want to create a Lappen for a specific Model, use the `lappen` generator:
+
+```sh
+$ bin/rails generate lappen product
+```
 
 ### Using a Lappen
 
