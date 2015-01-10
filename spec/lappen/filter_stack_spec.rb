@@ -8,24 +8,24 @@ describe Lappen::FilterStack do
   describe '.find' do
     let(:model) { double('model') }
 
-    context 'with the argument responding to .lappen_class' do
+    context 'with the argument responding to .filter_stack_class' do
       it 'returns the deposited class' do
-        allow(model).to receive(:lappen_class) { subject }
+        allow(model).to receive(:filter_stack_class) { subject }
         expect(described_class.find(model)).to eq(subject)
       end
     end
 
-    context 'with the argument not responding to .lappen_class' do
+    context 'with the argument not responding to .filter_stack_class' do
       before do
         allow(model).to receive(:to_s) { 'Model' }
-        ModelLappen = subject
+        ModelFilterStack = subject
       end
 
       after do
-        Object.send(:remove_const, :ModelLappen)
+        Object.send(:remove_const, :ModelFilterStack)
       end
 
-      it 'returns class name appended with "Lappen"' do
+      it 'returns class name appended with "FilterStack"' do
         expect(described_class.find(model)).to eq(subject)
       end
     end

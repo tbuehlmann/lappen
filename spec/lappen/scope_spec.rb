@@ -9,16 +9,16 @@ describe Lappen::Scope do
         extend Lappen::Scope
       end
 
-      ModelLappen = Class.new(Lappen::FilterStack)
+      ModelFilterStack = Class.new(Lappen::FilterStack)
     end
 
     after do
       Object.send(:remove_const, :Model)
-      Object.send(:remove_const, :ModelLappen)
+      Object.send(:remove_const, :ModelFilterStack)
     end
 
     it 'calls #perform on the associated Lappen' do
-      expect(ModelLappen).to receive(:perform).with(Model, params)
+      expect(ModelFilterStack).to receive(:perform).with(Model, params)
       Model.lappen(params)
     end
   end

@@ -25,54 +25,54 @@ $ bundle install
 
 ## Usage
 
-### Defining a Lappen
+### Defining a Filter Stack
 
-Inside your Rails application, define a subclass of `Lappen::FilterStack` for a Model you want to lappen. Inside this FilterStack (or: "Lappen"), use the class method `use` to configure the Filters that shall be used:
+Inside your Rails application, define a subclass of `Lappen::FilterStack` for a Model you want to run Filters on. Inside this Filter Stack, use the class method `use` to configure the Filters that shall be used:
 
 ```ruby
-class ProductLappen < Lappen::FilterStack
+class ProductFilterStack < Lappen::FilterStack
   use Lappen::Filters::Kaminari
   use Lappen::Filters::Orderer
 end
 ```
 
-This Lappen will use the Filters `Kaminari` and `Orderer` (in exactly this order).
+This Filter Stack will use the Filters `Kaminari` and `Orderer` (in exactly this order).
 
-A suitable location to place Lappens is `app/lappens`. This is also the default location for Lappens created via the generators.
+A suitable location to place Filter Stacks is `app/filter_stacks`. This is also the default location for Filter Stacks created via the generators.
 
-If you want to create an `ApplicationLappen` from which all Lappens can inherit, use the `install` generator:
+If you want to create an `ApplicationFilterStack` from which all Filter Stacks can inherit, use the `install` generator:
 
 ```sh
 $ bin/rails generate lappen:install
 ```
 
-TODO: If you want to create a Lappen for a specific Model, use the `lappen` generator:
+TODO: If you want to create a Filter Stack for a specific Model, use the `filter_stack` generator:
 
 ```sh
-$ bin/rails generate lappen product
+$ bin/rails generate lappen:filter_stack product
 ```
 
-### Using a Lappen
+### Using a Filter Stack
 
-After defining a Lappen, you can use it in your controller:
+After defining a Filter Stack, you can use it in your controller:
 
 ```ruby
 class ProductsController < ApplicationController
   def index
-    @products = ProductLappen.perform(Product.all, params)
+    @products = ProductFilterStack.perform(Product.all, params)
   end
 end
 ```
 
-`ProductLappen.perform` will apply any Filter you configured in the Lappen on the scope you provided as the first argument. In order to do their work, Filters get access to the `params` object you can provide as the second argument.
+`ProductFilterStack.perform` will apply any Filter you configured in the Filter Stack on the scope you provided as the first argument. In order to do their work, Filters get access to the `params` object you can provide as the second argument.
 
-When using ActiveRecord, all Models will get a shortcut class method for free. Having a Model (or relation for) `Product` with a Lappen `ProductLappen`, you can simply call `Product.lappen(params)`. This works internally by appending the word "Lappen" to the calling Model. If you want to use the shortcut with a different Lappen, define a class method `lappen_class` on the Model:
+When using ActiveRecord, all Models will get a shortcut class method for free. Having a Model (or relation for) `Product` with a Filter Stack `ProductFilterStack`, you can simply call `Product.lappen(params)`. This works internally by appending "FilterStack" to the calling Model. If you want to use the shortcut with a different Filter Stack, define a class method `filter_stack_class` on the Model:
 
 ```ruby
 class Product < ActiveRecord::Base
   class << self
-    def lappen_class
-      MyProductLappen
+    def filter_stack_class
+      MyProductFilterStack
     end
   end
 end
@@ -96,10 +96,10 @@ class MyFilter
 end
 ```
 
-… and add the Filter to your Lappen:
+… and add the Filter to your Filter Stack:
 
 ```ruby
-class ProductLappen < Lappen::FilterStack
+class ProductFilterStack < Lappen::FilterStack
   use Lappen::Filters::Kaminari
   use Lappen::Filters::Orderer
   use MyFilter

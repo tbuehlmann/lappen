@@ -6,10 +6,10 @@ module Lappen
       attr_writer :filters
 
       def find(klass)
-        if klass.respond_to?(:lappen_class)
-          klass.lappen_class
+        if klass.respond_to?(:filter_stack_class)
+          klass.filter_stack_class
         else
-          "#{klass}Lappen".constantize
+          "#{klass}FilterStack".constantize
         end
       end
 
