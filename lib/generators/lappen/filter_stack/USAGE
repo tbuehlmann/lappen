@@ -1,0 +1,8 @@
+Description:
+    Generates a Filter Stack for a Model with the given name.
+
+Example:
+    bin/rails generate lappen:filter_stack product
+
+    This will create:
+        app/filter_stacks/product_filter_stack.rb

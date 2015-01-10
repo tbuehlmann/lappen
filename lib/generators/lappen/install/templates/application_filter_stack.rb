@@ -1,4 +1,4 @@
-class ApplicationLappen < Lappen::FilterStack
+class ApplicationFilterStack < Lappen::FilterStack
   # Configure Filters here:
   #
   # use Lappen::Filters::Kaminari, page_key: 'page', per_key: 'per'

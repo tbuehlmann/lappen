@@ -23,6 +23,12 @@ And then execute:
 $ bundle install
 ```
 
+Optionally create an `ApplicationFilterStack` from which all Filter Stacks can inherit from by running:
+
+```sh
+$ bin/rails generate lappen:install
+```
+
 ## Usage
 
 ### Defining a Filter Stack
@@ -40,13 +46,7 @@ This Filter Stack will use the Filters `Kaminari` and `Orderer` (in exactly this
 
 A suitable location to place Filter Stacks is `app/filter_stacks`. This is also the default location for Filter Stacks created via the generators.
 
-If you want to create an `ApplicationFilterStack` from which all Filter Stacks can inherit, use the `install` generator:
-
-```sh
-$ bin/rails generate lappen:install
-```
-
-TODO: If you want to create a Filter Stack for a specific Model, use the `filter_stack` generator:
+If you want to create a Filter Stack for a specific Model, use the `filter_stack` generator:
 
 ```sh
 $ bin/rails generate lappen:filter_stack product
