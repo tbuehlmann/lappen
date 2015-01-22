@@ -2,7 +2,19 @@
 
 [![Gem Version](https://badge.fury.io/rb/lappen.svg)](http://badge.fury.io/rb/lappen) [![Build Status](https://travis-ci.org/tbuehlmann/lappen.svg?branch=master)](https://travis-ci.org/tbuehlmann/lappen)
 
-TODO.
+## Rationale
+
+```ruby
+class ProductsController < ApplicationController
+  def index
+    @products = policy_scope(Product.active).with_name(params[:name]).ordered_by(params[:order]).page(params[:page]).per(params[:per]).includes(:reviews).decorate
+  end
+end
+```
+
+Ever faced code like this? Right, me too. And I don't like it.
+
+This Library targets the problem of polluted controller actions by abstracting the method chaining in a middleware-oriented fashion.
 
 ## Requirements
 
