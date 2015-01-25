@@ -1,3 +1,5 @@
+require 'lappen/filters/association_embedder'
+require 'lappen/filters/association_includer'
 require 'lappen/filters/draper'
 require 'lappen/filters/filterer'
 require 'lappen/filters/kaminari'
