@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'bundler/setup'
+require 'pry'
 require 'lappen'
 
-require 'pry'
 Pry.start
