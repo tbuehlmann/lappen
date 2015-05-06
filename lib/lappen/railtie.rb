@@ -4,13 +4,13 @@ module Lappen
   class Railtie < Rails::Railtie
     initializer 'lappen.setup_action_controller' do |app|
       ActiveSupport.on_load(:action_controller) do
-        Lappen.setup_action_controller(self)
+        include Lappen::RequestContext::Hooks
       end
     end
 
     initializer 'lappen.setup_active_record' do |app|
       ActiveSupport.on_load(:active_record) do
-        Lappen.setup_active_record(self)
+        extend Lappen::Scope
       end
     end
   end

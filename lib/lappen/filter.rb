@@ -1,4 +1,3 @@
-require 'active_support/core_ext/array/extract_options'
 require 'lappen/request_context'
 
 module Lappen
@@ -7,10 +6,10 @@ module Lappen
 
     attr_reader :stack, :args, :options
 
-    def initialize(stack, *args)
+    def initialize(stack, *args, **options)
       @stack   = stack
       @args    = args
-      @options = args.extract_options!
+      @options = options
     end
 
     def perform(scope, params = {})
