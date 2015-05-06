@@ -121,10 +121,10 @@ end
 Any further arguments are injected into the Filter's constructor:
 
 ```ruby
-  use MyFilter, :foo, :bar
+  use MyFilter, :foo, bar: 'baz'
 ```
 
-… will initialize the Filter as `MyFilter.new(stack, :foo, :bar)`.
+… will initialize the Filter as `MyFilter.new(stack, :foo, bar: 'baz')`.
 
 In order to save you some time, there's already a class following the interface you can inherit from:
 
