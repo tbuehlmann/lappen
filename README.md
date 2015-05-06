@@ -98,7 +98,7 @@ If you want to write and use your own Filter, create a class following the commo
 
 ```ruby
 class MyFilter
-  def initialize(stack, *args)
+  def initialize(stack, *args, **options)
     # …
   end
 
