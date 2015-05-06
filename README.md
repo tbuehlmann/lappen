@@ -18,7 +18,7 @@ This Library targets the problem of polluted controller actions by abstracting t
 
 ## Requirements
 
-- Ruby ≥ 1.9.3
+- Ruby  ~> 2.0
 - Rails ~> 4.0
 
 ## Installation
