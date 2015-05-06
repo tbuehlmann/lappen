@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/tbuehlmann/lappen'
   spec.license       = 'MIT'
 
-  spec.files         = `git ls-files -z`.split("\x0")
+  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.executables   = []
   spec.test_files    = spec.files.grep(/\Aspec/)
   spec.require_paths = ['lib']
