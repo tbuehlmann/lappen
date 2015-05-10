@@ -2,10 +2,10 @@ module Lappen
   module Filters
     class Orderer < Filter
       def perform(scope, params = {})
-        reordering = reordering(params)
+        ordering = ordering(params)
 
-        if reordering.any?
-          ordered_scope = scope.reorder(reordering)
+        if ordering.any?
+          ordered_scope = reorder? ? scope.reorder(ordering) : scope.order(ordering)
           stack.perform(ordered_scope, params)
         else
           stack.perform(scope, params)
@@ -14,8 +14,8 @@ module Lappen
 
       private
 
-      def reordering(params)
-        @reordering ||= if params[order_key].kind_of?(String)
+      def ordering(params)
+        @ordering ||= if params[order_key].kind_of?(String)
           params[order_key].split(order_delimiter).each_with_object({}) do |order, reorder_hash|
             attribute, direction = split_attribute_with_direction(order)
             reorder_hash[attribute] = direction if orderable?(attribute)
@@ -23,6 +23,10 @@ module Lappen
         else
           {}
         end
+      end
+
+      def reorder?
+        options.fetch(:reorder, false)
       end
 
       def order_key
