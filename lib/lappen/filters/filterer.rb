@@ -14,10 +14,10 @@ module Lappen
       private
 
       def filter_arguments(params)
-        params.slice(*filter_attributes)
+        params.slice(*filterable_attributes)
       end
 
-      def filter_attributes
+      def filterable_attributes
         args.flatten.uniq.map(&:to_s)
       end
     end
