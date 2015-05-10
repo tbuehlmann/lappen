@@ -1,6 +1,6 @@
 module Lappen
   module Filters
-    class ExactFilterer < Filter
+    class ExactFilter < Filter
       def perform(scope, params = {})
         filter_arguments = filter_arguments(params)
 

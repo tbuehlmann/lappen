@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'active_support/core_ext/hash/indifferent_access'
 
-describe Lappen::Filters::ExactFilterer do
+describe Lappen::Filters::ExactFilter do
   subject { described_class.new(stack, *args) }
   let(:stack) { double('stack', perform: nil) }
   let(:scope) { double('scope') }
