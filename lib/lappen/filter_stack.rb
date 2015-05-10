@@ -13,8 +13,8 @@ module Lappen
         end
       end
 
-      def use(filter, *args)
-        filters << [filter, args]
+      def use(filter, *args, **options)
+        filters << [filter, args, options]
       end
 
       def filters
@@ -31,8 +31,8 @@ module Lappen
     end
 
     def perform(scope, params = {})
-      filter_class, args = enumerator.next
-      filter = filter_class.new(self, *args)
+      filter_class, args, options = enumerator.next
+      filter = filter_class.new(self, *args, **options)
       filter.perform(scope, params)
     rescue StopIteration
       scope

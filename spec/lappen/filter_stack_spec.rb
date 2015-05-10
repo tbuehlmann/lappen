@@ -34,7 +34,7 @@ describe Lappen::FilterStack do
   describe '.use' do
     it 'adds the arguments to the filters variable' do
       subject.use(Object, 42, foo: 'bar')
-      expect(subject.filters).to match_array([[Object, [42, {foo: 'bar'}]]])
+      expect(subject.filters).to match_array([[Object, [42], {foo: 'bar'}]])
     end
   end
 
