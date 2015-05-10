@@ -134,7 +134,7 @@ class MyFilter < Lappen::Filter
 end
 ```
 
-This class will also extract Hash options from `args`, giving you `args` and `options` getter methods.
+Inside the class you have access to `args` and `options` getter methods referencing the initialized arguments.
 
 #### Returning Early
 
