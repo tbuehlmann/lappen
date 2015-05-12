@@ -5,10 +5,9 @@ module Lappen
         ordering = ordering(params)
 
         if ordering.any?
-          ordered_scope = reorder? ? scope.reorder(ordering) : scope.order(ordering)
-          stack.perform(ordered_scope, params)
+          reorder? ? scope.reorder(ordering) : scope.order(ordering)
         else
-          stack.perform(scope, params)
+          scope
         end
       end
 

@@ -5,10 +5,10 @@ module Lappen
         associations = associations(params)
 
         if associations.any?
-          includer = AssociationIncluder.new(stack, *associations)
+          includer = AssociationIncluder.new(*associations)
           includer.perform(scope)
         else
-          stack.perform(scope)
+          scope
         end
       end
 

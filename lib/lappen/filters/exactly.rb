@@ -5,10 +5,9 @@ module Lappen
         filter_arguments = filter_arguments(params)
 
         if filter_arguments.any?
-          filtered_scope = scope.where(filter_arguments)
-          stack.perform(filtered_scope, params)
+          scope.where(filter_arguments)
         else
-          stack.perform(scope, params)
+          scope
         end
       end
 

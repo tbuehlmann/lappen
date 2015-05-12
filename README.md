@@ -98,7 +98,7 @@ If you want to write and use your own Filter, create a class following the commo
 
 ```ruby
 class MyFilter
-  def initialize(stack, *args, **options)
+  def initialize(*args, **options)
     # …
   end
 
@@ -124,7 +124,7 @@ Any further arguments are injected into the Filter's constructor:
   use MyFilter, :foo, bar: 'baz'
 ```
 
-… will initialize the Filter as `MyFilter.new(stack, :foo, bar: 'baz')`.
+… will initialize the Filter as `MyFilter.new(:foo, bar: 'baz')`.
 
 In order to save you some time, there's already a class following the interface you can inherit from:
 
@@ -138,7 +138,21 @@ Inside the class you have access to `args` and `options` getter methods referenc
 
 #### Returning Early
 
-Normally, each Filter runs `stack.perform(scope, params)` at the end of its `perform` method to tell the next Filter to run. If you want to stop further filtering (for whatever reason), simply return the scope instead of calling `stack.perform(scope, params)`.
+Normally, the FilterStack runs each Filter after another, using a filter's output as the next filter's input. If you want to stop further filtering (for whatever reason), throw `:halt` with the result scope:
+
+```ruby
+class MyFilter < Lappen::Filter
+  def perform(scope, params = {})
+    if some_condition
+      throw(:halt, scope.none)
+    else
+      # …
+    end
+  end
+end
+```
+
+Throwing `:halt` will stop the FilterStack from running any further Filter and the throwed scope will be returned.
 
 ### Request Context
 

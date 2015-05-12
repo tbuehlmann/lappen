@@ -8,7 +8,7 @@ describe Lappen::RequestContext::Hooks do
 
   describe 'memoize_context' do
     before do
-      controller_class.send(:include, described_class)
+      controller_class.include(described_class)
       allow(controller).to receive(:view_context) { view_context }
     end
 

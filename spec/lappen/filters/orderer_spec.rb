@@ -1,8 +1,7 @@
 require 'spec_helper'
 
 describe Lappen::Filters::Orderer do
-  subject { described_class.new(stack, *args, **options) }
-  let(:stack)   { double('stack', perform: nil) }
+  subject { described_class.new(*args, **options) }
   let(:args)    { [] }
   let(:options) { {} }
   let(:scope)   { double('scope') }
@@ -19,8 +18,6 @@ describe Lappen::Filters::Orderer do
         expect(scope).to_not receive(:order)
         subject.perform(scope, params)
       end
-
-      it_behaves_like 'a filter that calls the stack'
     end
 
     context 'without an allowed ordering' do
@@ -30,8 +27,6 @@ describe Lappen::Filters::Orderer do
         expect(scope).to receive(:order).with({'foo' => :asc, 'bar' => :desc})
         subject.perform(scope, params)
       end
-
-      it_behaves_like 'a filter that calls the stack'
     end
 
     context 'with the reorder option' do
@@ -42,8 +37,6 @@ describe Lappen::Filters::Orderer do
         expect(scope).to receive(:reorder).with({'foo' => :asc, 'bar' => :desc})
         subject.perform(scope, params)
       end
-
-      it_behaves_like 'a filter that calls the stack'
     end
   end
 end

@@ -55,35 +55,57 @@ describe Lappen::FilterStack do
   end
 
   describe '#perform' do
-    let(:stack)    { subject.new }
-    let(:filter_1) { Class.new(Lappen::Filter) }
-    let(:filter_2) { Class.new(Lappen::Filter) }
+    let(:stack) { subject.new }
 
-    before do
-      subject.use(filter_1)
-      subject.use(filter_2)
+    let(:add_one) do
+      Class.new(Lappen::Filter) do
+        def perform(scope, params = {})
+          scope + 1
+        end
+      end
     end
 
-    it 'calls #perform on the next filter from the stack' do
-      expect_any_instance_of(filter_1).to receive(:perform).with(scope, params).once
-      expect_any_instance_of(filter_2).to_not receive(:perform)
-
-      stack.perform(scope, params)
+    let(:add_two) do
+      Class.new(Lappen::Filter) do
+        def perform(scope, params = {})
+          scope + 2
+        end
+      end
     end
 
-    it 'calls #perform on filters just once' do
-      expect_any_instance_of(filter_1).to receive(:perform).with(scope, params).once
-      expect_any_instance_of(filter_2).to receive(:perform).with(scope, params).once
-
-      stack.perform(scope, params)
-      stack.perform(scope, params)
+    let(:halter) do
+      Class.new(Lappen::Filter) do
+        def perform(scope, params = {})
+          throw(:halt, 42)
+        end
+      end
     end
 
-    it 'returns the scope argument if there are no more filters on the stack' do
-      stack.perform(scope, params)
-      stack.perform(scope, params)
+    it 'calls #perform on each filter from the stack' do
+      subject.use(add_one)
+      subject.use(add_two)
 
-      expect(stack.perform(scope, params)).to eq(scope)
+      expect_any_instance_of(add_one).to receive(:perform).with(0, params).once.and_call_original
+      expect_any_instance_of(add_two).to receive(:perform).with(1, params).once.and_call_original
+
+      stack.perform(0, params)
+    end
+
+    it 'returns filtered scope' do
+      subject.use(add_one)
+      subject.use(add_two)
+
+      filtered_scope = stack.perform(0, params)
+      expect(filtered_scope).to eq(3)
+    end
+
+    it 'catches :halt and returns it' do
+      subject.use(halter)
+      subject.use(add_one)
+      subject.use(add_two)
+
+      filtered_scope = stack.perform(0, params)
+      expect(filtered_scope).to eq(42)
     end
   end
 end

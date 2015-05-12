@@ -2,8 +2,7 @@ require 'spec_helper'
 require 'active_support/core_ext/hash/indifferent_access'
 
 describe Lappen::Filters::Exactly do
-  subject { described_class.new(stack, *args) }
-  let(:stack) { double('stack', perform: nil) }
+  subject { described_class.new(*args) }
   let(:scope) { double('scope') }
 
   describe '#perform' do
@@ -18,8 +17,6 @@ describe Lappen::Filters::Exactly do
       it 'filters the scope' do
         subject.perform(scope, params)
       end
-
-      it_behaves_like 'a filter that calls the stack'
     end
 
     context 'without a configured filterable attribute' do
@@ -30,8 +27,6 @@ describe Lappen::Filters::Exactly do
         expect(scope).to_not receive(:where)
         subject.perform(scope, params)
       end
-
-      it_behaves_like 'a filter that calls the stack'
     end
 
     context 'without a filterable key-value-pair in params' do
@@ -42,8 +37,6 @@ describe Lappen::Filters::Exactly do
         expect(scope).to_not receive(:where)
         subject.perform(scope, params)
       end
-
-      it_behaves_like 'a filter that calls the stack'
     end
 
     context 'with a malformed value type in params' do
@@ -54,8 +47,6 @@ describe Lappen::Filters::Exactly do
         expect(scope).to_not receive(:where)
         subject.perform(scope, params)
       end
-
-      it_behaves_like 'a filter that calls the stack'
     end
   end
 end

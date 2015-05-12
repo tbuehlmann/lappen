@@ -31,17 +31,21 @@ module Lappen
     end
 
     def perform(scope, params = {})
-      filter_class, args, options = enumerator.next
-      filter = filter_class.new(self, *args, **options)
-      filter.perform(scope, params)
-    rescue StopIteration
-      scope
+      catch(:halt) do
+        self.class.filters.each do |triplet|
+          filter = instantiate_filter(triplet)
+          scope = filter.perform(scope, params)
+        end
+
+        scope
+      end
     end
 
     private
 
-    def enumerator
-      @enumerator ||= self.class.filters.to_enum
+    def instantiate_filter(triplet)
+      filter_class, args, options = triplet
+      filter_class.new(self, *args, **options)
     end
   end
 end

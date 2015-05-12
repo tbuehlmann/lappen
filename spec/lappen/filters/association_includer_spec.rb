@@ -1,22 +1,16 @@
 require 'spec_helper'
 
 describe Lappen::Filters::AssociationIncluder do
-  subject { described_class.new(stack, *args) }
-  let(:stack)  { double('stack', perform: nil) }
+  subject { described_class.new(*args) }
   let(:args)   { [:category, :reviews] }
   let(:scope)  { double('scope') }
   let(:params) { double('params') }
+  let(:filtered_scope) { double('filtered scope') }
 
   describe '#perform' do
-    before do
-      allow(scope).to receive(:includes)
-    end
-
-    it 'calls #includes on the scope' do
+    it '#includes the arguments in the scope' do
       expect(scope).to receive(:includes).with(args)
       subject.perform(scope, params)
     end
-
-    it_behaves_like 'a filter that calls the stack'
   end
 end

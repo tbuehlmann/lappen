@@ -5,21 +5,21 @@ describe Lappen::Scope do
     let(:params) { double('params') }
 
     before do
-      class Model
+      class Category < ActiveRecord::Base
         extend Lappen::Scope
       end
 
-      ModelFilterStack = Class.new(Lappen::FilterStack)
+      CategoryFilterStack = Class.new(Lappen::FilterStack)
     end
 
     after do
-      Object.send(:remove_const, :Model)
-      Object.send(:remove_const, :ModelFilterStack)
+      Object.send(:remove_const, :Category)
+      Object.send(:remove_const, :CategoryFilterStack)
     end
 
     it 'calls #perform on the associated Lappen' do
-      expect(ModelFilterStack).to receive(:perform).with(Model, params)
-      Model.lappen(params)
+      expect(CategoryFilterStack).to receive(:perform).with(Category, params)
+      Category.lappen(params)
     end
   end
 end

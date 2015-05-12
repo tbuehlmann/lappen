@@ -4,16 +4,15 @@ module Lappen
   class Filter
     include RequestContext
 
-    attr_reader :stack, :args, :options
+    attr_reader :args, :options
 
-    def initialize(stack, *args, **options)
-      @stack   = stack
+    def initialize(*args, **options)
       @args    = args
       @options = options
     end
 
     def perform(scope, params = {})
-      stack.perform(scope, params)
+      scope
     end
   end
 end

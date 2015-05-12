@@ -2,8 +2,7 @@ require 'spec_helper'
 require 'active_support/core_ext/hash/indifferent_access'
 
 describe Lappen::Filters::Kaminari do
-  subject { described_class.new(stack, *args) }
-  let(:stack) { double('stack', perform: nil) }
+  subject { described_class.new(*args) }
   let(:args)  { [] }
   let(:scope) { double('scope') }
 
@@ -23,8 +22,6 @@ describe Lappen::Filters::Kaminari do
 
         subject.perform(scope, params)
       end
-
-      it_behaves_like 'a filter that calls the stack'
     end
 
     context 'without custom keys provided' do
@@ -36,8 +33,6 @@ describe Lappen::Filters::Kaminari do
 
         subject.perform(scope, params)
       end
-
-      it_behaves_like 'a filter that calls the stack'
     end
   end
 end
