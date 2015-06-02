@@ -92,8 +92,6 @@ end
 
 A list of built-in Filters is available in the [Wiki](https://github.com/tbuehlmann/lappen/wiki).
 
-Here will be a link to a list of built-in Filters later on.
-
 ### Writing a Filter
 
 If you want to write and use your own Filter, create a class following the common interface:
