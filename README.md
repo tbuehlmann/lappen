@@ -90,6 +90,8 @@ class Product < ActiveRecord::Base
 end
 ```
 
+A list of built-in Filters is available in the [Wiki](https://github.com/tbuehlmann/lappen/wiki).
+
 Here will be a link to a list of built-in Filters later on.
 
 ### Writing a Filter
