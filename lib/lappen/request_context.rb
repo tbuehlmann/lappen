@@ -1,7 +1,7 @@
 require 'request_store'
 
 # Idea from:
-# # From: https://github.com/drapergem/draper/blob/724e735a0310bd29412749a4fdbed376db5d580f/lib/draper/view_context.rb
+# https://github.com/drapergem/draper/blob/724e735a0310bd29412749a4fdbed376db5d580f/lib/draper/view_context.rb
 module Lappen
   module RequestContext
     class << self
