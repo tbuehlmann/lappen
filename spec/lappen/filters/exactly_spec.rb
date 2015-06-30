@@ -10,11 +10,8 @@ describe Lappen::Filters::Exactly do
       let(:args)   { [:name, :status] }
       let(:params) { {name: 'foo', status: '42'}.with_indifferent_access }
 
-      before do
-        expect(scope).to receive(:where).with(name: 'foo', status: '42') { scope }
-      end
-
       it 'filters the scope' do
+        expect(scope).to receive(:where).with('name' => 'foo', 'status' => '42') { scope }
         subject.perform(scope, params)
       end
     end

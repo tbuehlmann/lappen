@@ -5,7 +5,7 @@ module Lappen
         filter_arguments = filter_arguments(params)
 
         if filter_arguments.any?
-          scope.where(filter_arguments)
+          scope.where(filter_arguments.to_hash)
         else
           scope
         end
