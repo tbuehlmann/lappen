@@ -1,6 +1,7 @@
 require 'lappen/filter'
 require 'lappen/filter_stack'
 require 'lappen/filters'
+require 'lappen/notifications'
 require 'lappen/railtie'
 require 'lappen/scope'
 require 'lappen/request_context'
