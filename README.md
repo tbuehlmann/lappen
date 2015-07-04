@@ -171,3 +171,87 @@ class MyFilter < Lappen::Filter
   end
 end
 ```
+
+### Callbacks
+
+The FilterStack class supports (before/around/after) Callbacks in order to be able to hook into filtering actions. There are two actions to hook into: the `:perform` and the `:filter` action.
+
+The `:perform` Callbacks are run when calling `FilterStack.perform`. They surround the calling of all the FilterStack's Filters.
+
+The `:filter` Callbacks are run when single Filters are called by a FilterStack. They surround just the filter's performing.
+
+Example:
+
+```ruby
+FilterA = Class.new(Lappen::Filter)
+FilterB = Class.new(Lappen::Filter)
+
+class ProductFilterStack < Lappen::FilterStack
+  use FilterA
+  use FilterB
+
+  set_callback(:perform, :before) { puts 'before perform' }
+  set_callback(:perform, :after)  { puts 'after perform' }
+  set_callback(:perform, :around) do |filter_stack, block|
+    puts 'around perform (before)'
+    block.call
+    puts 'around perform (after)'
+  end
+
+  set_callback(:filter, :before) { puts "  before #{current_filter.class}" }
+  set_callback(:filter, :after)  { puts "  after #{current_filter.class}" }
+  set_callback(:filter, :around) do |filter_stack, block|
+    puts "    around #{current_filter.class} (before)"
+    block.call
+    puts "    around #{current_filter.class} (after)"
+  end
+end
+```
+
+Calling `ProductFilterStack.perform(scope = {}, params = {})` will output the following:
+
+```
+before perform
+around perform (before)
+  before FilterA
+    around FilterA (before)
+    around FilterA (after)
+  after FilterA
+  before FilterB
+    around FilterB (before)
+    around FilterB (after)
+  after FilterB
+around perform (after)
+after perform
+```
+
+In order to access the Filter currently being performed on a `:filter` action, call `current_filter`.
+
+Callbacks are available in subclasses dynamically. Defining a Callback in a superclass will make it available in its subclasses, even if they were already defined.
+
+### Notifications
+
+If you want to fanout `ActiveSupport::Notifications` on the performings of a FilterStack and single Filters, include the `Lappen::Notifications` module into your FilterStack:
+
+```ruby
+class ProductFilterStack < Lappen::FilterStack
+  include Lappen::Notifications
+end
+```
+
+By doing so, Notification Events with the keys `'lappen.perform'` and `'lappen.filter'` will be sent. You can subscribe to these Events like this:
+
+```ruby
+ActiveSupport::Notifications.subscribe('lappen.perform') do |name, start, finish, id, payload|
+  puts payload[:filter_stack]
+end
+
+ActiveSupport::Notifications.subscribe('lappen.filter') do |name, start, finish, id, payload|
+  puts payload[:filter_stack]
+  puts payload[:filter]
+end
+```
+
+There is always a `:filter_stack` key available in the payload, returning the performing FilterStack instance. When subscribing to `'lappen.filter'`, you can additionally access the performing Filter instance using the `:filter` key.
+
+As `Lappen::Notifications` uses Callbacks internally, subclasses of a class that has the `Lappen::Notifications` module included will also instrument Notifications.
