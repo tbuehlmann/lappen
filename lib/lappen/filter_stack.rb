@@ -45,7 +45,7 @@ module Lappen
 
     def instantiate_filter(triplet)
       filter_class, args, options = triplet
-      filter_class.new(self, *args, **options)
+      filter_class.new(*args, **options)
     end
   end
 end
