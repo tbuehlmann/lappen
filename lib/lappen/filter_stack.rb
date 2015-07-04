@@ -32,7 +32,7 @@ module Lappen
       end
     end
 
-    attr_accessor :scope, :params
+    attr_accessor :scope, :params, :current_filter
 
     def initialize(scope, params = {})
       self.scope  = scope
@@ -54,9 +54,10 @@ module Lappen
     private
 
     def perform_filter(triplet)
+      self.current_filter = instantiate_filter(triplet)
+
       run_callbacks(:filter) do
-        filter = instantiate_filter(triplet)
-        filter.perform(scope, params)
+        current_filter.perform(scope, params)
       end
     end
 
