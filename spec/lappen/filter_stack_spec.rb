@@ -40,7 +40,7 @@ describe Lappen::FilterStack do
 
   describe '.perform' do
     it 'instantiates the class and runs #perform' do
-      expect_any_instance_of(subject).to receive(:perform).with(scope, params).once
+      expect_any_instance_of(subject).to receive(:perform).once
       subject.perform(scope, params)
     end
   end
@@ -55,8 +55,6 @@ describe Lappen::FilterStack do
   end
 
   describe '#perform' do
-    let(:stack) { subject.new }
-
     let(:add_one) do
       Class.new(Lappen::Filter) do
         def perform(scope, params = {})
@@ -88,14 +86,14 @@ describe Lappen::FilterStack do
       expect_any_instance_of(add_one).to receive(:perform).with(0, params).once.and_call_original
       expect_any_instance_of(add_two).to receive(:perform).with(1, params).once.and_call_original
 
-      stack.perform(0, params)
+      subject.perform(0, params)
     end
 
     it 'returns filtered scope' do
       subject.use(add_one)
       subject.use(add_two)
 
-      filtered_scope = stack.perform(0, params)
+      filtered_scope = subject.perform(0, params)
       expect(filtered_scope).to eq(3)
     end
 
@@ -104,7 +102,7 @@ describe Lappen::FilterStack do
       subject.use(add_one)
       subject.use(add_two)
 
-      filtered_scope = stack.perform(0, params)
+      filtered_scope = subject.perform(0, params)
       expect(filtered_scope).to eq(42)
     end
   end

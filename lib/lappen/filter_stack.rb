@@ -1,10 +1,12 @@
+require 'active_support/callbacks'
 require 'active_support/inflector'
 
 module Lappen
   class FilterStack
-    class << self
-      attr_writer :filters
+    include ActiveSupport::Callbacks
+    define_callbacks :perform, :filter
 
+    class << self
       def find(klass)
         if klass.respond_to?(:filter_stack_class)
           klass.filter_stack_class
@@ -22,26 +24,41 @@ module Lappen
       end
 
       def perform(scope, params = {})
-        new.perform(scope, params)
+        new(scope, params).perform
       end
 
       def inherited(subclass)
-        subclass.filters = filters.dup
+        subclass.filters.concat(filters.dup)
       end
     end
 
-    def perform(scope, params = {})
-      catch(:halt) do
-        self.class.filters.each do |triplet|
-          filter = instantiate_filter(triplet)
-          scope = filter.perform(scope, params)
-        end
+    attr_accessor :scope, :params
 
-        scope
+    def initialize(scope, params = {})
+      self.scope  = scope
+      self.params = params
+    end
+
+    def perform
+      run_callbacks(:perform) do
+        catch(:halt) do
+          self.class.filters.each do |triplet|
+            self.scope = perform_filter(triplet)
+          end
+
+          scope
+        end
       end
     end
 
     private
+
+    def perform_filter(triplet)
+      run_callbacks(:filter) do
+        filter = instantiate_filter(triplet)
+        filter.perform(scope, params)
+      end
+    end
 
     def instantiate_filter(triplet)
       filter_class, args, options = triplet
