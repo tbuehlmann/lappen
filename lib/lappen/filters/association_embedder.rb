@@ -2,7 +2,7 @@ module Lappen
   module Filters
     class AssociationEmbedder < Filter
       def perform(scope, params = {})
-        associations = associations(params)
+        associations = associations_for(params)
 
         if associations.any?
           includer = AssociationIncluder.new(*associations)
@@ -14,35 +14,33 @@ module Lappen
 
       private
 
-      def associations(params)
-        @associations ||= begin
-          association_params = params[include_key]
+      def associations_for(params)
+        association_params = params[include_key]
 
-          association_array = case association_params
-          when String
-            association_params.split(delimiter)
-          when Array
-            association_params
-          else
-            []
-          end
+        associations = case association_params
+        when String
+          association_params.split(delimiter)
+        when Array
+          association_params.map(&:to_s)
+        else
+          []
+        end
 
-          association_array.select do |assoc|
-            valid_association?(assoc)
-          end
+        associations.select do |association|
+          valid_association?(association)
         end
       end
 
       def include_key
-        options[:include_key] || :include
+        options.fetch(:include_key, :include)
       end
 
       def delimiter
-        options[:delimiter] || ','
+        options.fetch(:delimiter, ',')
       end
 
       def valid_association?(association)
-        args.any? { |assoc| assoc.to_s == association}
+        args.any? { |valid_association| valid_association.to_s == association }
       end
     end
   end
