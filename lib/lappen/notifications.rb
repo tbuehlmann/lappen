@@ -1,18 +1,18 @@
-require 'active_support/concern'
+require 'lappen/callbacks'
 require 'active_support/notifications'
 
 module Lappen
   module Notifications
-    extend ActiveSupport::Concern
+    def self.included(base)
+      base.__send__(:include, Lappen::Callbacks)
 
-    included do
-      set_callback(:perform, :around) do |filter_stack, block|
+      base.around_perform do |filter_stack, block|
         ActiveSupport::Notifications.instrument('lappen.perform', filter_stack: filter_stack) do
           block.call
         end
       end
 
-      set_callback(:filter, :around) do |filter_stack, block|
+      base.around_filter do |filter_stack, block|
         ActiveSupport::Notifications.instrument('lappen.filter', filter_stack: filter_stack, filter: filter_stack.current_filter) do
           block.call
         end

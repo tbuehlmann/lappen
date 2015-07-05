@@ -174,55 +174,34 @@ end
 
 ### Callbacks
 
-The FilterStack class supports (before/around/after) Callbacks in order to be able to hook into filtering actions. There are two actions to hook into: the `:perform` and the `:filter` action.
+When including `Lappen::Callbacks` into a FilterStack, it will support (before/around/after) Callbacks in order to be able to hook into filtering actions. There are two actions to hook into: the `:perform` and the `:filter` action.
 
-The `:perform` Callbacks are run when calling `FilterStack.perform`. They surround the calling of all the FilterStack's Filters.
+The Callbacks for the `:perform` action are run when calling `FilterStack.perform`. They surround the calling of all the FilterStack's Filters.
 
-The `:filter` Callbacks are run when single Filters are called by a FilterStack. They surround just the filter's performing.
+The Callbacks for the `:filter` action are run when single Filters are called by a FilterStack. They surround just the filter's performing.
 
-Example:
+Example for the `:perform` action:
 
 ```ruby
-FilterA = Class.new(Lappen::Filter)
-FilterB = Class.new(Lappen::Filter)
-
 class ProductFilterStack < Lappen::FilterStack
-  use FilterA
-  use FilterB
+  include Lappen::Callbacks
 
-  set_callback(:perform, :before) { puts 'before perform' }
-  set_callback(:perform, :after)  { puts 'after perform' }
-  set_callback(:perform, :around) do |filter_stack, block|
-    puts 'around perform (before)'
-    block.call
-    puts 'around perform (after)'
-  end
+  before_perform { puts 'before' }
+  after_perform  { puts 'after' }
 
-  set_callback(:filter, :before) { puts "  before #{current_filter.class}" }
-  set_callback(:filter, :after)  { puts "  after #{current_filter.class}" }
-  set_callback(:filter, :around) do |filter_stack, block|
-    puts "    around #{current_filter.class} (before)"
+  around_perform do |filter_stack, block|
+    puts 'around before'
     block.call
-    puts "    around #{current_filter.class} (after)"
+    puts 'around after'
   end
 end
-```
 
-Calling `ProductFilterStack.perform(scope = {}, params = {})` will output the following:
+ProductFilterStack.perform(scope = {})
 
-```
-before perform
-around perform (before)
-  before FilterA
-    around FilterA (before)
-    around FilterA (after)
-  after FilterA
-  before FilterB
-    around FilterB (before)
-    around FilterB (after)
-  after FilterB
-around perform (after)
-after perform
+# before
+# around before
+# around after
+# after
 ```
 
 In order to access the Filter currently being performed on a `:filter` action, call `current_filter`.

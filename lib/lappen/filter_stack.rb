@@ -1,11 +1,7 @@
-require 'active_support/callbacks'
 require 'active_support/inflector'
 
 module Lappen
   class FilterStack
-    include ActiveSupport::Callbacks
-    define_callbacks :perform, :filter
-
     class << self
       def find(klass)
         if klass.respond_to?(:filter_stack_class)
@@ -40,25 +36,20 @@ module Lappen
     end
 
     def perform
-      run_callbacks(:perform) do
-        catch(:halt) do
-          self.class.filters.each do |triplet|
-            self.scope = perform_filter(triplet)
-          end
-
-          scope
+      catch(:halt) do
+        self.class.filters.each do |triplet|
+          self.current_filter = instantiate_filter(triplet)
+          self.scope = perform_filter
         end
+
+        scope
       end
     end
 
     private
 
-    def perform_filter(triplet)
-      self.current_filter = instantiate_filter(triplet)
-
-      run_callbacks(:filter) do
-        current_filter.perform(scope, params)
-      end
+    def perform_filter
+      current_filter.perform(scope, params)
     end
 
     def instantiate_filter(triplet)

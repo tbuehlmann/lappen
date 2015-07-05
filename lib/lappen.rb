@@ -1,3 +1,4 @@
+require 'lappen/callbacks'
 require 'lappen/filter'
 require 'lappen/filter_stack'
 require 'lappen/filters'
