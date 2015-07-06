@@ -156,7 +156,7 @@ Throwing `:halt` will stop the FilterStack from running any further Filter and t
 
 ### Request Context
 
-There are times in life you need to use information from the current request in your Filter. In order to do so, `Lappen::Filter` includes the `Lappen::RequestContext` module, which enables you to use the private `controller` and `view_context` methods. Using these you can for example access the commonly used `current_user` method:
+There are times in life you need to use information from the current request in your Filter. In order to do so, `Lappen::Filter` includes the `Lappen::RequestContext` module, which enables you to use the private `controller` and `view_context` methods. Using those you can for example access the commonly used `current_user` method:
 
 ```ruby
 class MyFilter < Lappen::Filter
@@ -204,7 +204,7 @@ ProductFilterStack.perform(scope = {})
 # after
 ```
 
-In order to access the Filter currently being performed on a `:filter` action, call `current_filter`.
+In order to access the Filter currently being performed on a `:filter` action, call `filter`.
 
 Callbacks are available in subclasses dynamically. Defining a Callback in a superclass will make it available in its subclasses, even if they were already defined.
 

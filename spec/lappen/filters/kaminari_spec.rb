@@ -1,10 +1,11 @@
 require 'spec_helper'
-require 'active_support/core_ext/hash/indifferent_access'
 
 describe Lappen::Filters::Kaminari do
-  subject { described_class.new(*args) }
-  let(:args)  { [] }
-  let(:scope) { double('scope') }
+  subject { described_class.new(**options.merge(meta: meta)) }
+
+  let(:options)  { {} }
+  let(:meta)     { {} }
+  let(:scope)    { double('scope') }
 
   describe '#perform' do
     before do
@@ -13,25 +14,35 @@ describe Lappen::Filters::Kaminari do
     end
 
     context 'with custom keys provided' do
-      let(:args)   { [page_key: 'seite', per_key: 'pro'] }
-      let(:params) { {seite: '5', pro: '42'}.with_indifferent_access }
+      let(:options) { {page_key: 'seite', per_key: 'pro', meta: meta} }
+      let(:params)  { {'seite' => 5, 'pro' => 42} }
 
       it 'calls #page and #per on the scope with the corresponding params' do
-        expect(scope).to receive(:page).with('5')
-        expect(scope).to receive(:per).with('42')
+        expect(scope).to receive(:page).with(5)
+        expect(scope).to receive(:per).with(42)
 
         subject.perform(scope, params)
+      end
+
+      it 'adds meta information' do
+        subject.perform(scope, params)
+        expect(meta[:kaminari]).to eq(page: 5, per: 42)
       end
     end
 
     context 'without custom keys provided' do
-      let(:params) { {page: '5', per: '42'}.with_indifferent_access }
+      let(:params) { {'page' => 5, 'per' => 42} }
 
       it 'calls #page and #per on the scope with the corresponding params' do
-        expect(scope).to receive(:page).with('5')
-        expect(scope).to receive(:per).with('42')
+        expect(scope).to receive(:page).with(5)
+        expect(scope).to receive(:per).with(42)
 
         subject.perform(scope, params)
+      end
+
+      it 'adds meta information' do
+        subject.perform(scope, params)
+        expect(meta[:kaminari]).to eq(page: 5, per: 42)
       end
     end
   end

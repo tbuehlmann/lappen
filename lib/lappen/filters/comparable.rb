@@ -1,3 +1,5 @@
+require 'active_support/hash_with_indifferent_access'
+
 module Lappen
   module Filters
     class Comparable < Filter
@@ -9,6 +11,7 @@ module Lappen
 
       def perform(scope, params = {})
         populate_comparables!(params)
+        add_meta_information
 
         minima.each do |attribute, value|
           arel_attribute = scope.klass.arel_table[attribute]
@@ -31,17 +34,19 @@ module Lappen
 
       def populate_comparables!(params)
         params.each do |key, value|
+          key = key.to_s
+
           if key.end_with?('_min')
             attribute = key[0..-5]
 
             if comparable_attribute?(attribute)
-              memoize_minimum(attribute, value)
+              memoize_minimum(attribute.to_sym, value)
             end
           elsif key.end_with?('_max')
             attribute = key[0..-5]
 
             if comparable_attribute?(attribute)
-              memoize_maximum(attribute, value)
+              memoize_maximum(attribute.to_sym, value)
             end
           end
         end
@@ -84,11 +89,19 @@ module Lappen
       end
 
       def comparable_attribute?(attribute)
-        comparable_attributes.include?(attribute)
+        attribute.kind_of?(String) && comparable_attributes.include?(attribute)
       end
 
       def comparable_attributes
-        @comparable_attributes ||= args.flatten.uniq.map(&:to_s)
+        @comparable_attributes ||= args.flatten.map(&:to_s).uniq
+      end
+
+      def add_meta_information
+        min = minima.merge(Hash[ranges.map { |attribute, range| [attribute, range.min] }])
+        max = maxima.merge(Hash[ranges.map { |attribute, range| [attribute, range.max] }])
+
+        meta[:comparable] ||= {}
+        meta[:comparable].merge!(minima: min, maxima: max)
       end
     end
   end

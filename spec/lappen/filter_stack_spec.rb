@@ -2,8 +2,9 @@ require 'spec_helper'
 
 describe Lappen::FilterStack do
   subject { Class.new(described_class) }
+
   let(:scope)  { double('scope') }
-  let(:params) { double('params') }
+  let(:params) { {} }
 
   describe '.find' do
     let(:model) { double('model') }
@@ -41,7 +42,7 @@ describe Lappen::FilterStack do
   describe '.perform' do
     it 'instantiates the class and runs #perform' do
       expect_any_instance_of(subject).to receive(:perform).once
-      subject.perform(scope, params)
+      subject.perform(scope = Object, params = {})
     end
   end
 

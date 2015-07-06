@@ -13,7 +13,7 @@ module Lappen
       end
 
       base.around_filter do |filter_stack, block|
-        ActiveSupport::Notifications.instrument('lappen.filter', filter_stack: filter_stack, filter: filter_stack.current_filter) do
+        ActiveSupport::Notifications.instrument('lappen.filter', filter_stack: filter_stack, filter: filter_stack.filter) do
           block.call
         end
       end

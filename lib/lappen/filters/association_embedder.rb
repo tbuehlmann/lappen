@@ -5,7 +5,7 @@ module Lappen
         associations = associations_for(params)
 
         if associations.any?
-          includer = AssociationIncluder.new(*associations)
+          includer = AssociationIncluder.new(*associations, meta: meta)
           includer.perform(scope)
         else
           scope
@@ -40,7 +40,11 @@ module Lappen
       end
 
       def valid_association?(association)
-        args.any? { |valid_association| valid_association.to_s == association }
+        valid_associations.include?(association)
+      end
+
+      def valid_associations
+        @valid_associations ||= args.flatten.map(&:to_s).uniq
       end
     end
   end

@@ -1,9 +1,10 @@
 require 'spec_helper'
-require 'active_support/core_ext/hash/indifferent_access'
 
 describe Lappen::Filters::Comparable do
-  subject { described_class.new(*args) }
+  subject { described_class.new(*args, meta: meta) }
+
   let(:args)  { [:price] }
+  let(:meta)  { {} }
   let(:scope) { Product.all }
 
   before(:all) do
@@ -18,29 +19,44 @@ describe Lappen::Filters::Comparable do
 
   describe '#perform' do
     context 'with a minimum' do
-      let(:params) { {price_min: '3'}.with_indifferent_access }
+      let(:params) { {price_min: 3} }
 
       it 'filters the scope' do
         products = subject.perform(scope, params)
         expect(products.count).to eq(2)
       end
+
+      it 'adds meta information' do
+        subject.perform(scope, params)
+        expect(meta[:comparable]).to eq(minima: {price: 3}, maxima: {})
+      end
     end
 
     context 'with a maximum' do
-      let(:params) { {price_max: '3'}.with_indifferent_access }
+      let(:params) { {price_max: 3} }
 
       it 'filters the scope' do
         products = subject.perform(scope, params)
         expect(products.count).to eq(1)
       end
+
+      it 'adds meta information' do
+        subject.perform(scope, params)
+        expect(meta[:comparable]).to eq(minima: {}, maxima: {price: 3})
+      end
     end
 
     context 'with a range' do
-      let(:params) { {price_min: '2', price_max: '4'}.with_indifferent_access }
+      let(:params) { {price_min: 2, price_max: 4} }
 
       it 'filters the scope' do
         products = subject.perform(scope, params)
         expect(products.count).to eq(2)
+      end
+
+      it 'adds meta information' do
+        subject.perform(scope, params)
+        expect(meta[:comparable]).to eq(minima: {price: 2}, maxima: {price: 4})
       end
     end
   end

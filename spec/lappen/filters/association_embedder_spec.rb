@@ -1,8 +1,10 @@
 require 'spec_helper'
 
 describe Lappen::Filters::AssociationEmbedder do
-  subject { described_class.new(*args) }
-  let(:scope)  { double('scope') }
+  subject { described_class.new(*args, meta: meta) }
+
+  let(:meta)  { {} }
+  let(:scope) { double('scope') }
 
   describe '#perform' do
     before do
@@ -17,7 +19,7 @@ describe Lappen::Filters::AssociationEmbedder do
         let(:includer) { double('association_includer', perform: nil) }
 
         it 'includes the association' do
-          expect(Lappen::Filters::AssociationIncluder).to receive(:new).with('reviews') { includer }
+          expect(Lappen::Filters::AssociationIncluder).to receive(:new).with('reviews', meta: meta) { includer }
           expect(includer).to receive(:perform).with(scope)
 
           subject.perform(scope, params)

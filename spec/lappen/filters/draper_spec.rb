@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe Lappen::Filters::Draper do
   subject { described_class.new }
+
   let(:scope)  { double('scope') }
   let(:params) { double('params') }
 

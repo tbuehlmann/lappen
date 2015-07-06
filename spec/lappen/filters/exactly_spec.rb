@@ -1,18 +1,26 @@
 require 'spec_helper'
-require 'active_support/core_ext/hash/indifferent_access'
 
 describe Lappen::Filters::Exactly do
-  subject { described_class.new(*args) }
+  subject { described_class.new(*args, meta: meta) }
+
+  let(:meta)  { {} }
   let(:scope) { double('scope') }
 
   describe '#perform' do
     context 'with filterable attributes' do
       let(:args)   { [:name, :status] }
-      let(:params) { {name: 'foo', status: '42'}.with_indifferent_access }
+      let(:params) { {'name' => 'foo', 'status' => 42} }
 
       it 'filters the scope' do
-        expect(scope).to receive(:where).with('name' => 'foo', 'status' => '42') { scope }
+        expect(scope).to receive(:where).with(params)
         subject.perform(scope, params)
+      end
+
+      it 'adds meta information' do
+        allow(scope).to receive(:where)
+        subject.perform(scope, params)
+
+        expect(meta[:exactly]).to eq(name: 'foo', status: 42)
       end
     end
 

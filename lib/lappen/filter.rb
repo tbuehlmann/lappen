@@ -14,5 +14,11 @@ module Lappen
     def perform(scope, params = {})
       scope
     end
+
+    private
+
+    def meta
+      @meta ||= options[:meta]
+    end
   end
 end

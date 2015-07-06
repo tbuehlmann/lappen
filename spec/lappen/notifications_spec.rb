@@ -2,8 +2,9 @@ require 'spec_helper'
 
 describe Lappen::Notifications do
   describe 'included' do
-    let(:scope)  { double('scope') }
-    let(:filter) { Class.new(Lappen::Filter) }
+    let(:scope)   { double('scope') }
+    let(:params)  { {} }
+    let(:filter)  { Class.new(Lappen::Filter) }
 
     let(:stack) do
       Class.new(Lappen::FilterStack).tap do |klass|
@@ -14,14 +15,14 @@ describe Lappen::Notifications do
 
     it 'will fanout lappen.perform events' do
       expect(ActiveSupport::Notifications).to receive(:instrument).with('lappen.perform', hash_including(filter_stack: instance_of(stack)))
-      stack.perform(scope)
+      stack.perform(scope, params)
     end
 
     it 'will fanout lappen.filter events' do
       allow(ActiveSupport::Notifications).to receive(:instrument).and_call_original
       expect(ActiveSupport::Notifications).to receive(:instrument).with('lappen.filter', hash_including(filter_stack: instance_of(stack), filter: instance_of(filter)))
 
-      stack.perform(scope)
+      stack.perform(scope, params)
     end
   end
 end

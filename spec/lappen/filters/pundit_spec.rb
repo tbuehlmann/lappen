@@ -2,32 +2,47 @@ require 'spec_helper'
 
 describe Lappen::Filters::Pundit do
   describe '#perform' do
-    subject { described_class.new(*args) }
-    let(:args)   { [] }
-    let(:scope)  { double('scope') }
-    let(:params) { {} }
+    subject { described_class.new(meta: meta) }
 
-    context 'with a corresponding Pundit scope' do
-      let(:policy_scope) { double('resolved_policy_scope') }
+    let(:meta)    { {} }
+    let(:scope)   { double('scope') }
 
-      before do
-        allow(subject).to receive(:policy_scope) { policy_scope }
-      end
+    before do
+      allow(subject).to receive(:pundit_user)
 
-      it 'changes the scope' do
-        filtered_scope = subject.perform(scope, params)
-        expect(filtered_scope).to eq(policy_scope)
+      module Pundit
+        class Scope
+          def initialize(pundit_user, scope)
+          end
+
+          def resolve
+            42
+          end
+        end
+
+        class PolicyFinder
+          def initialize(scope)
+          end
+
+          def scope!
+            Scope
+          end
+        end
       end
     end
 
-    context 'without a corresponding Pundit scope' do
-      before do
-        allow(subject).to receive(:policy_scope) { nil }
+    after do
+      Object.send(:remove_const, :Pundit)
+    end
+
+    context 'with a corresponding Pundit scope' do
+      it 'changes the scope' do
+        expect(subject.perform(scope)).to eq(42)
       end
 
-      it 'does not change the scope' do
-        filtered_scope = subject.perform(scope, params)
-        expect(filtered_scope).to eq(scope)
+      it 'adds meta information' do
+        subject.perform(scope)
+        expect(meta[:pundit]).to match_array(Pundit::Scope)
       end
     end
   end

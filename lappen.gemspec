@@ -26,6 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'pry'
+  spec.add_development_dependency 'pry-stack_explorer'
   spec.add_development_dependency 'actionpack', '~> 4.0'
   spec.add_development_dependency 'activerecord', '~> 4.0'
   spec.add_development_dependency 'sqlite3'

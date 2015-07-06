@@ -28,7 +28,7 @@ module Lappen
       end
     end
 
-    attr_accessor :scope, :params, :current_filter
+    attr_accessor :scope, :params, :filter
 
     def initialize(scope, params = {})
       self.scope  = scope
@@ -38,7 +38,7 @@ module Lappen
     def perform
       catch(:halt) do
         self.class.filters.each do |triplet|
-          self.current_filter = instantiate_filter(triplet)
+          self.filter = instantiate_filter(triplet)
           self.scope = perform_filter
         end
 
@@ -46,15 +46,19 @@ module Lappen
       end
     end
 
+    def meta
+      @meta ||= {}
+    end
+
     private
 
     def perform_filter
-      current_filter.perform(scope, params)
+      filter.perform(scope, params)
     end
 
     def instantiate_filter(triplet)
       filter_class, args, options = triplet
-      filter_class.new(*args, **options)
+      filter_class.new(*args, **options.merge(meta: meta))
     end
   end
 end
