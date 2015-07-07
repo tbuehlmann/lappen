@@ -1,30 +1,13 @@
-require 'active_support/hash_with_indifferent_access'
-
 module Lappen
   module Filters
     class Comparable < Filter
-      DEFAULT_PARSER = Object.new.tap do |parser|
-        def parser.parse(value)
-          value
-        end
-      end
-
       def perform(scope, params = {})
-        populate_comparables!(params)
-        add_meta_information
+        comparables = comparables_for(params)
+        conditions = conditions_for(comparables, scope)
+        add_meta_information(comparables)
 
-        minima.each do |attribute, value|
-          arel_attribute = scope.klass.arel_table[attribute]
-          scope = scope.where(arel_attribute.gteq(value))
-        end
-
-        maxima.each do |attribute, value|
-          arel_attribute = scope.klass.arel_table[attribute]
-          scope = scope.where(arel_attribute.lteq(value))
-        end
-
-        ranges.each do |attribute, range|
-          scope = scope.where(attribute => range)
+        conditions.each do |condition|
+          scope = scope.where(condition)
         end
 
         scope
@@ -32,76 +15,61 @@ module Lappen
 
       private
 
-      def populate_comparables!(params)
-        params.each do |key, value|
-          key = key.to_s
+      def comparables_for(params)
+        params.each_with_object(min: {}, max: {}) do |(key, value), comparables|
+          attribute, extreme = attribute_and_extreme_for(key)
 
-          if key.end_with?('_min')
-            attribute = key[0..-5]
-
-            if comparable_attribute?(attribute)
-              memoize_minimum(attribute.to_sym, value)
-            end
-          elsif key.end_with?('_max')
-            attribute = key[0..-5]
-
-            if comparable_attribute?(attribute)
-              memoize_maximum(attribute.to_sym, value)
-            end
+          if valid_extreme?(extreme) && comparable_attribute?(attribute)
+            comparables[extreme.to_sym][attribute.to_sym] = parse_value(value)
           end
         end
       end
 
-      def memoize_minimum(attribute, value)
-        parsed_value = parser.parse(value)
-
-        if maximum_value = maxima.delete(attribute)
-          ranges[attribute] = parsed_value..maximum_value
-        else
-          minima[attribute] = parsed_value
+      def conditions_for(comparables, scope)
+        comparables.each_with_object([]) do |(extreme, pairs), conditions|
+          pairs.each do |attribute, value|
+            arel_attribute = scope.klass.arel_table[attribute]
+            conditions << condition_for(extreme, arel_attribute, value)
+          end
         end
       end
 
-      def memoize_maximum(attribute, value)
-        parsed_value = parser.parse(value)
-
-        if minimum_value = minima.delete(attribute)
-          ranges[attribute] = minimum_value..parsed_value
-        else
-          maxima[attribute] = parsed_value
+      def condition_for(extreme, arel_attribute, value)
+        case extreme
+        when :min
+          arel_attribute.gteq(value)
+        when :max
+          arel_attribute.lteq(value)
         end
       end
 
-      def minima
-        @minima ||= {}
+      def attribute_and_extreme_for(key)
+        key.to_s.split(/_(min|max)\z/)
       end
 
-      def maxima
-        @maxima ||= {}
+      def valid_extreme?(extreme)
+        ['min', 'max'].include?(extreme)
       end
 
-      def ranges
-        @ranges ||= {}
+      def parse_value(value)
+        parser ? parser.parse(value) : value
       end
 
       def parser
-        @parser ||= options.fetch(:parser, DEFAULT_PARSER)
+        options[:parser]
       end
 
       def comparable_attribute?(attribute)
-        attribute.kind_of?(String) && comparable_attributes.include?(attribute)
+        comparable_attributes.include?(attribute)
       end
 
       def comparable_attributes
         @comparable_attributes ||= args.flatten.map(&:to_s).uniq
       end
 
-      def add_meta_information
-        min = minima.merge(Hash[ranges.map { |attribute, range| [attribute, range.min] }])
-        max = maxima.merge(Hash[ranges.map { |attribute, range| [attribute, range.max] }])
-
+      def add_meta_information(comparables)
         meta[:comparable] ||= {}
-        meta[:comparable].merge!(minima: min, maxima: max)
+        meta[:comparable].merge!(comparables)
       end
     end
   end

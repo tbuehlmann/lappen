@@ -28,7 +28,7 @@ describe Lappen::Filters::Comparable do
 
       it 'adds meta information' do
         subject.perform(scope, params)
-        expect(meta[:comparable]).to eq(minima: {price: 3}, maxima: {})
+        expect(meta[:comparable]).to eq(min: {price: 3}, max: {})
       end
     end
 
@@ -42,7 +42,7 @@ describe Lappen::Filters::Comparable do
 
       it 'adds meta information' do
         subject.perform(scope, params)
-        expect(meta[:comparable]).to eq(minima: {}, maxima: {price: 3})
+        expect(meta[:comparable]).to eq(min: {}, max: {price: 3})
       end
     end
 
@@ -56,7 +56,7 @@ describe Lappen::Filters::Comparable do
 
       it 'adds meta information' do
         subject.perform(scope, params)
-        expect(meta[:comparable]).to eq(minima: {price: 2}, maxima: {price: 4})
+        expect(meta[:comparable]).to eq(min: {price: 2}, max: {price: 4})
       end
     end
   end
