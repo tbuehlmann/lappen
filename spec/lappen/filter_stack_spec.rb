@@ -42,7 +42,7 @@ describe Lappen::FilterStack do
   describe '.perform' do
     it 'instantiates the class and runs #perform' do
       expect_any_instance_of(subject).to receive(:perform).once
-      subject.perform(scope = Object, params = {})
+      subject.perform(Object, {})
     end
   end
 
