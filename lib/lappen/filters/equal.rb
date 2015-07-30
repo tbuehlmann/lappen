@@ -1,6 +1,6 @@
 module Lappen
   module Filters
-    class Exactly < Filter
+    class Equal < Filter
       PERMITTED_TYPES = [
         String,
         Symbol,
@@ -10,14 +10,14 @@ module Lappen
         FalseClass,
         Date,
         Time
-      ]
+      ].freeze
 
       def perform(scope, params = {})
-        filter_arguments = filter_arguments(params)
-        add_meta_information(filter_arguments)
+        filters = filters(params)
+        add_meta_information(filters)
 
-        if filter_arguments.any?
-          scope.where(filter_arguments.to_hash)
+        if filters.any?
+          scope.where(filters.to_hash)
         else
           scope
         end
@@ -25,13 +25,27 @@ module Lappen
 
       private
 
-      def filter_arguments(params)
-        filterables = params.slice(*filterable_attributes)
+      def filters(params)
+        filterables = filter_arguments(params).slice(*filterable_attributes)
         filterables.select { |_attribute, value| permitted_value?(value) }
       end
 
+      def filter_arguments(params)
+        filter_arguments = filter_key ? params[filter_key] : params
+
+        if filter_arguments.kind_of?(Hash)
+          filter_arguments
+        else
+          {}
+        end
+      end
+
+      def filter_key
+        @filter_key ||= options.fetch(:filter_key, 'filter')
+      end
+
       def filterable_attributes
-        args.flatten.uniq.map(&:to_s)
+        args.flatten.map(&:to_s).uniq
       end
 
       def permitted_value?(value)
@@ -46,9 +60,9 @@ module Lappen
         value.kind_of?(Array) && value.all? { |element| permitted_value?(element) }
       end
 
-      def add_meta_information(filter_arguments)
+      def add_meta_information(filters)
         meta[:exactly] ||= {}
-        meta[:exactly].merge!(filter_arguments.symbolize_keys)
+        meta[:exactly].merge!(filters.symbolize_keys)
       end
     end
   end
