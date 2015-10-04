@@ -23,7 +23,7 @@ describe Lappen::Filters::Equal do
         allow(scope).to receive(:where)
         subject.perform(scope, params)
 
-        expect(meta[:exactly]).to eq(name: 'foo', status: 42)
+        expect(meta[:equal]).to eq(name: 'foo', status: 42)
       end
     end
 
