@@ -61,8 +61,8 @@ module Lappen
       end
 
       def add_meta_information(filters)
-        meta[:exactly] ||= {}
-        meta[:exactly].merge!(filters.symbolize_keys)
+        meta[:equal] ||= {}
+        meta[:equal].merge!(filters.symbolize_keys)
       end
     end
   end
