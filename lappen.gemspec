@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.version       = Lappen::VERSION
   spec.authors       = ['Tobias Bühlmann']
   spec.email         = ['tobias@xn--bhlmann-n2a.de']
-  spec.summary       = 'Method chaining abstraction library for Rails.'
+  spec.summary       = 'Scope filtering abstraction library for Rails.'
   spec.homepage      = 'https://github.com/tbuehlmann/lappen'
   spec.license       = 'MIT'
 
