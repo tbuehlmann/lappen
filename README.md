@@ -14,7 +14,7 @@ end
 
 Ever faced code like this? Right, me too. And I don't like it.
 
-This Library targets the problem of polluted controller index actions by abstracting the method chaining in a middleware-oriented fashion.
+This Library targets the problem of Scope filtering (and polluted controller index actions) by abstracting the method chaining in a middleware-oriented fashion.
 
 ## Requirements
 
