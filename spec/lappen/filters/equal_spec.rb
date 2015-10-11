@@ -11,11 +11,11 @@ describe Lappen::Filters::Equal do
   describe '#perform' do
     context 'with filterable attributes' do
       let(:args)    { [:name, :status] }
-      let(:filters) { {'name' => 'foo', 'status' => 42} }
-      let(:params)  { {'filter' => filters} }
+      let(:filters) { {name: 'foo', status: 42} }
+      let(:params)  { {filter: filters}.with_indifferent_access }
 
       it 'filters the scope' do
-        expect(scope).to receive(:where).with(filters)
+        expect(scope).to receive(:where).with(any_args)
         subject.perform(scope, params)
       end
 
@@ -31,8 +31,8 @@ describe Lappen::Filters::Equal do
     # the passed argument is an unpermitted instance of ActionController::Parameters.
     context 'with ActionController::Parameters as params' do
       let(:args)    { [:name, :status] }
-      let(:filters) { {'name' => 'foo', 'status' => 42} }
-      let(:params)  { ActionController::Parameters.new('filter' => filters) }
+      let(:filters) { {name: 'foo', status: 42} }
+      let(:params)  { ActionController::Parameters.new(filter: filters) }
 
       it 'calls .where with a Hash, not with ActionController::Parameters' do
         expect(scope).to receive(:where).with(instance_of(Hash))
@@ -42,7 +42,7 @@ describe Lappen::Filters::Equal do
 
     context 'without a configured filterable attribute' do
       let(:args)   { [] }
-      let(:params) { {filter: {'name' => 'foo'}} }
+      let(:params) { {filter: {name: 'foo'}}.with_indifferent_access }
 
       it 'does not filter the scope' do
         expect(scope).to_not receive(:where)
@@ -52,7 +52,7 @@ describe Lappen::Filters::Equal do
 
     context 'without a filterable key-value-pair in params' do
       let(:args)   { [:name] }
-      let(:params) { {filter: {}} }
+      let(:params) { {filter: {}}.with_indifferent_access }
 
       it 'does not filter the scope' do
         expect(scope).to_not receive(:where)
@@ -62,7 +62,7 @@ describe Lappen::Filters::Equal do
 
     context 'with a malformed filters object' do
       let(:args)   { [] }
-      let(:params) { {filter: nil} }
+      let(:params) { {filter: nil}.with_indifferent_access }
 
       it 'does not filter the scope' do
         expect(scope).to_not receive(:where)
@@ -72,23 +72,23 @@ describe Lappen::Filters::Equal do
 
     context 'with a malformed value type in params' do
       let(:args)    { [:name, :status] }
-      let(:filters) { {'name' => {}, 'status' => 42} }
-      let(:params)  { {filter: filters} }
+      let(:filters) { {name: {}, status: 42} }
+      let(:params)  { {filter: filters}.with_indifferent_access }
 
       it 'does not filter the scope with invalid types' do
-        expect(scope).to_not receive(:where).with('status' => 42)
+        expect(scope).to_not receive(:where).with(status: 42)
         subject.perform(scope, params)
       end
     end
 
     context 'with a different filter_key' do
-      let(:options) { {filter_key: 'filters_with_s'} }
+      let(:options) { {filter_key: :custom_filter_key} }
       let(:args)    { [:name, :status] }
-      let(:filters) { {'name' => 'foo', 'status' => 42} }
-      let(:params)  { {'filters_with_s' => filters} }
+      let(:filters) { {name: 'foo', status: 42} }
+      let(:params)  { {custom_filter_key: filters}.with_indifferent_access }
 
       it 'filters the scope' do
-        expect(scope).to receive(:where).with(filters)
+        expect(scope).to receive(:where).with(any_args)
         subject.perform(scope, params)
       end
     end
@@ -96,10 +96,10 @@ describe Lappen::Filters::Equal do
     context 'without a filter_key' do
       let(:options) { {filter_key: nil} }
       let(:args)    { [:name, :status] }
-      let(:params)  { {'name' => 'foo', 'status' => 42} }
+      let(:params)  { {name: 'foo', status: 42}.with_indifferent_access }
 
       it 'filters the scope' do
-        expect(scope).to receive(:where).with(params)
+        expect(scope).to receive(:where).with(any_args)
         subject.perform(scope, params)
       end
     end
