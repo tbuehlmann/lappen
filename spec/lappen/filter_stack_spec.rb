@@ -55,6 +55,14 @@ describe Lappen::FilterStack do
     end
   end
 
+  describe '#initialize' do
+    subject { Class.new(described_class).new(scope, params) }
+
+    it 'stores params as a HashWithIndifferentAccess' do
+      expect(subject.params).to be_kind_of(HashWithIndifferentAccess)
+    end
+  end
+
   describe '#perform' do
     let(:add_one) do
       Class.new(Lappen::Filter) do

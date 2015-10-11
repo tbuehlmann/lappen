@@ -41,7 +41,7 @@ module Lappen
       end
 
       def filter_key
-        @filter_key ||= options.fetch(:filter_key, 'filter')
+        @filter_key ||= options.fetch(:filter_key, :filter)
       end
 
       def filterable_attributes

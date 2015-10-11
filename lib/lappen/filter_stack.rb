@@ -1,3 +1,4 @@
+require 'active_support/hash_with_indifferent_access'
 require 'active_support/inflector'
 
 module Lappen
@@ -32,7 +33,7 @@ module Lappen
 
     def initialize(scope, params = {})
       self.scope  = scope
-      self.params = params
+      self.params = ActiveSupport::HashWithIndifferentAccess.new_from_hash_copying_default(params)
     end
 
     def perform
