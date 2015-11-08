@@ -138,7 +138,7 @@ Inside the class you have access to `args` and `options` getter methods referenc
 
 #### Returning Early
 
-Normally, the FilterStack runs each Filter after another, using a filter's output as the next filter's input. If you want to stop further filtering (for whatever reason), throw `:halt` with the result scope:
+Normally, the Filter Stack runs each Filter after another, using a filter's output as the next filter's input. If you want to stop further filtering (for whatever reason), throw `:halt` with the result scope:
 
 ```ruby
 class MyFilter < Lappen::Filter
@@ -152,7 +152,7 @@ class MyFilter < Lappen::Filter
 end
 ```
 
-Throwing `:halt` will stop the FilterStack from running any further Filter and the throwed scope will be returned.
+Throwing `:halt` will stop the Filter Stack from running any further Filter and the throwed scope will be returned.
 
 ### Request Context
 
@@ -174,9 +174,9 @@ end
 
 ### Callbacks
 
-When including `Lappen::Callbacks` into a FilterStack, it will support (before/around/after) Callbacks in order to be able to hook into filtering actions. There are two actions to hook into: the `:perform` and the `:filter` action.
+When including `Lappen::Callbacks` into a Filter Stack, it will support (before/around/after) Callbacks in order to be able to hook into filtering actions. There are two actions to hook into: the `:perform` and the `:filter` action.
 
-The Callbacks for the `:perform` action are run when calling `FilterStack.perform`. They surround the calling of all the FilterStack's Filters.
+The Callbacks for the `:perform` action are run when calling `FilterStack.perform`. They surround the calling of all the Filter Stack's Filters.
 
 The Callbacks for the `:filter` action are run when single Filters are called by a FilterStack. They surround just the filter's performing.
 
@@ -210,7 +210,7 @@ Callbacks are available in subclasses dynamically. Defining a Callback in a supe
 
 ### Notifications
 
-If you want to fanout `ActiveSupport::Notifications` on the performings of a FilterStack and single Filters, include the `Lappen::Notifications` module into your FilterStack:
+If you want to fanout `ActiveSupport::Notifications` on the performings of a Filter Stack and single Filters, include the `Lappen::Notifications` module into your Filter Stack:
 
 ```ruby
 class ProductFilterStack < Lappen::FilterStack
@@ -231,6 +231,31 @@ ActiveSupport::Notifications.subscribe('lappen.filter') do |name, start, finish,
 end
 ```
 
-There is always a `:filter_stack` key available in the payload, returning the performing FilterStack instance. When subscribing to `'lappen.filter'`, you can additionally access the performing Filter instance using the `:filter` key.
+There is always a `:filter_stack` key available in the payload, returning the performing Filter Stack instance. When subscribing to `'lappen.filter'`, you can additionally access the performing Filter instance using the `:filter` key.
 
 As `Lappen::Notifications` uses Callbacks internally, subclasses of a class that has the `Lappen::Notifications` module included will also instrument Notifications.
+
+### Meta Information
+
+It can be comfortable to know which Filter applied what condition to the scope. Consider an API that, beside delivering resources, provides information about attribute filtering, pagination or included associated resources. Meta information give you exactly this.
+
+Each Filter has access to a `meta` object which is used to memorize the conditions applied to a scope by a Filter Stack's Filters. The `meta` object is a Hash that gets populated by each Filter that is run. The Equal Filter for example would do something like the following when filtering the price:
+
+```ruby
+meta[:equal] ||= {}
+meta[:equal].merge!(price: 5000)
+```
+
+The `meta` object is accessable as `FilterStack#meta`. Example:
+
+```ruby
+class ProductFilterStack < Lappen::FilterStack
+  use Lappen::Filters::Equal, :price
+end
+
+stack = ProductFilterStack.new(Product.all, {filter: {price: 5000}})
+stack.meta # => {}
+
+products = stack.perform
+stack.meta # => {equal: {price: 5000}}
+```
