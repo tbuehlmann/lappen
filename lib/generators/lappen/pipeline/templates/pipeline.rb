@@ -1,5 +1,5 @@
 <% module_namespacing do -%>
-class <%= class_name %>FilterStack < <%= subclass %>
+class <%= class_name %>Pipeline < <%= subclass %>
   # Configure Filters here:
   #
   # use Lappen::Filters::Kaminari, page_key: 'page', per_key: 'per'

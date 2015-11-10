@@ -6,14 +6,14 @@ module Lappen
     def self.included(base)
       base.__send__(:include, Lappen::Callbacks)
 
-      base.around_perform do |filter_stack, block|
-        ActiveSupport::Notifications.instrument('lappen.perform', filter_stack: filter_stack) do
+      base.around_perform do |pipeline, block|
+        ActiveSupport::Notifications.instrument('lappen.perform', pipeline: pipeline) do
           block.call
         end
       end
 
-      base.around_filter do |filter_stack, block|
-        ActiveSupport::Notifications.instrument('lappen.filter', filter_stack: filter_stack, filter: filter_stack.filter) do
+      base.around_filter do |pipeline, block|
+        ActiveSupport::Notifications.instrument('lappen.filter', pipeline: pipeline, filter: pipeline.filter) do
           block.call
         end
       end

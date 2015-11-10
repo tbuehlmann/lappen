@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Lappen::FilterStack do
+describe Lappen::Pipeline do
   subject { Class.new(described_class) }
 
   let(:scope)  { double('scope') }
@@ -9,24 +9,24 @@ describe Lappen::FilterStack do
   describe '.find' do
     let(:model) { double('model') }
 
-    context 'with the argument responding to .filter_stack_class' do
+    context 'with the argument responding to .pipeline_class' do
       it 'returns the deposited class' do
-        allow(model).to receive(:filter_stack_class) { subject }
+        allow(model).to receive(:pipeline_class) { subject }
         expect(described_class.find(model)).to eq(subject)
       end
     end
 
-    context 'with the argument not responding to .filter_stack_class' do
+    context 'with the argument not responding to .pipeline_class' do
       before do
         allow(model).to receive(:to_s) { 'Model' }
-        ModelFilterStack = subject
+        ModelPipeline = subject
       end
 
       after do
-        Object.send(:remove_const, :ModelFilterStack)
+        Object.send(:remove_const, :ModelPipeline)
       end
 
-      it 'returns class name appended with "FilterStack"' do
+      it 'returns class name appended with "Pipeline"' do
         expect(described_class.find(model)).to eq(subject)
       end
     end
@@ -88,7 +88,7 @@ describe Lappen::FilterStack do
       end
     end
 
-    it 'calls #perform on each filter from the stack' do
+    it 'calls #perform on each filter from the pipeline' do
       subject.use(add_one)
       subject.use(add_two)
 

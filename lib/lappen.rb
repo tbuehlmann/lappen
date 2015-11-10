@@ -1,6 +1,6 @@
 require 'lappen/callbacks'
 require 'lappen/filter'
-require 'lappen/filter_stack'
+require 'lappen/pipeline'
 require 'lappen/filters'
 require 'lappen/notifications'
 require 'lappen/railtie'

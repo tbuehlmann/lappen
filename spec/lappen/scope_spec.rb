@@ -9,16 +9,16 @@ describe Lappen::Scope do
         extend Lappen::Scope
       end
 
-      CategoryFilterStack = Class.new(Lappen::FilterStack)
+      CategoryPipeline = Class.new(Lappen::Pipeline)
     end
 
     after do
       Object.send(:remove_const, :Category)
-      Object.send(:remove_const, :CategoryFilterStack)
+      Object.send(:remove_const, :CategoryPipeline)
     end
 
     it 'calls #perform on the associated Lappen' do
-      expect(CategoryFilterStack).to receive(:perform).with(Category, params)
+      expect(CategoryPipeline).to receive(:perform).with(Category, params)
       Category.lappen(params)
     end
   end

@@ -1,0 +1,8 @@
+Description:
+    Generates a Pipeline for a Model with the given name.
+
+Example:
+    bin/rails generate lappen:pipeline product
+
+    This will create:
+        app/pipelines/product_pipeline.rb

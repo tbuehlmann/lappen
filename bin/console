@@ -5,7 +5,7 @@ require 'pry'
 require 'lappen'
 
 L     = Lappen
-L::F  = Lappen::Filter
-L::FS = Lappen::FilterStack
+L::F = Lappen::Filter
+L::P = Lappen::Pipeline
 
 Pry.start

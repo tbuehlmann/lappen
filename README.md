@@ -14,7 +14,7 @@ end
 
 Ever faced code like this? Right, me too. And I don't like it.
 
-This Library targets the problem of Scope filtering (and polluted controller index actions) by abstracting the method chaining in a middleware-oriented fashion.
+This Library targets the problem of Relation filtering (and polluted controller index actions) by abstracting the method chaining in a Pipeline-oriented fashion.
 
 ## Requirements
 
@@ -35,7 +35,7 @@ And then execute:
 $ bundle install
 ```
 
-Optionally create an `ApplicationFilterStack` from which all Filter Stacks can inherit from by running:
+Optionally create an `ApplicationPipeline` from which all Pipelines can inherit from by running:
 
 ```sh
 $ bin/rails generate lappen:install
@@ -43,48 +43,48 @@ $ bin/rails generate lappen:install
 
 ## Usage
 
-### Defining a Filter Stack
+### Defining a Pipeline
 
-Inside your Rails application, define a subclass of `Lappen::FilterStack` for a Model you want to run Filters on. Inside this Filter Stack, use the class method `use` to configure the Filters that shall be used:
+Inside your Rails application, define a subclass of `Lappen::Pipeline` for a Model you want to run Filters on. Inside this Pipeline, use the class method `use` to configure the Filters that shall be used:
 
 ```ruby
-class ProductFilterStack < Lappen::FilterStack
+class ProductPipeline < Lappen::Pipeline
   use Lappen::Filters::Kaminari
   use Lappen::Filters::Orderer
 end
 ```
 
-This Filter Stack will use the Filters `Kaminari` and `Orderer` (in exactly this order).
+This Pipeline will use the Filters `Kaminari` and `Orderer` (in exactly this order).
 
-A suitable location to place Filter Stacks is `app/filter_stacks`. This is also the default location for Filter Stacks created via the generators.
+A suitable location to place Pipelines is `app/pipelines`. This is also the default location for Pipeline created via the generators.
 
-If you want to create a Filter Stack for a specific Model, use the `filter_stack` generator:
+If you want to create a Pipeline for a specific Model, use the `pipeline` generator:
 
 ```sh
-$ bin/rails generate lappen:filter_stack product
+$ bin/rails generate lappen:pipeline product
 ```
 
-### Using a Filter Stack
+### Using a Pipeline
 
-After defining a Filter Stack, you can use it in your controller:
+After defining a Pipeline, you can use it in your controller:
 
 ```ruby
 class ProductsController < ApplicationController
   def index
-    @products = ProductFilterStack.perform(Product.all, params)
+    @products = ProductPipeline.perform(Product.all, params)
   end
 end
 ```
 
-`ProductFilterStack.perform` will apply any Filter you configured in the Filter Stack on the scope you provided as the first argument. In order to do their work, Filters get access to the `params` object you can provide as the second argument.
+`ProductPipeline.perform` will apply any Filter you configured in the Pipeline class on the Relation you provided as the first argument. In order to do their work, Filters get access to the `params` object you can provide as the second argument.
 
-When using ActiveRecord, all Models will get a shortcut class method for free. Having a Model (or relation for) `Product` with a Filter Stack `ProductFilterStack`, you can simply call `Product.lappen(params)`. This works internally by appending "FilterStack" to the calling Model. If you want to use the shortcut with a different Filter Stack, define a class method `filter_stack_class` on the Model:
+When using ActiveRecord, all Models will get a shortcut class method for free. Having a Model `Product` with a Pipeline `ProductPipeline`, you can simply call `Product.lappen(params)`. This works internally by appending "Pipeline" to the calling Model. If you want to use the shortcut with a different Pipeline, define a class method `pipeline_class` on the Model:
 
 ```ruby
 class Product < ActiveRecord::Base
   class << self
-    def filter_stack_class
-      MyProductFilterStack
+    def pipeline_class
+      MyProductPipeline
     end
   end
 end
@@ -108,10 +108,10 @@ class MyFilter
 end
 ```
 
-… and add the Filter to your Filter Stack:
+… and add the Filter to your Pipeline:
 
 ```ruby
-class ProductFilterStack < Lappen::FilterStack
+class ProductPipeline < Lappen::Pipeline
   use Lappen::Filters::Kaminari
   use Lappen::Filters::Orderer
   use MyFilter
@@ -138,7 +138,7 @@ Inside the class you have access to `args` and `options` getter methods referenc
 
 #### Returning Early
 
-Normally, the Filter Stack runs each Filter after another, using a filter's output as the next filter's input. If you want to stop further filtering (for whatever reason), throw `:halt` with the result scope:
+Normally, the Pipeline runs each Filter after another, using a filter's output as the next filter's input. If you want to stop further filtering (for whatever reason), throw `:halt` with the result scope:
 
 ```ruby
 class MyFilter < Lappen::Filter
@@ -152,7 +152,7 @@ class MyFilter < Lappen::Filter
 end
 ```
 
-Throwing `:halt` will stop the Filter Stack from running any further Filter and the throwed scope will be returned.
+Throwing `:halt` will stop the Pipeline from running any further Filter and the throwed scope will be returned.
 
 ### Request Context
 
@@ -174,29 +174,29 @@ end
 
 ### Callbacks
 
-When including `Lappen::Callbacks` into a Filter Stack, it will support (before/around/after) Callbacks in order to be able to hook into filtering actions. There are two actions to hook into: the `:perform` and the `:filter` action.
+When including `Lappen::Callbacks` into a Pipeline, it will support (before/around/after) Callbacks in order to be able to hook into filtering actions. There are two actions to hook into: the `:perform` and the `:filter` action.
 
-The Callbacks for the `:perform` action are run when calling `FilterStack.perform`. They surround the calling of all the Filter Stack's Filters.
+The Callbacks for the `:perform` action are run when calling `ProductPipeline.perform`. They surround the calling of all the Pipeline's Filters.
 
-The Callbacks for the `:filter` action are run when single Filters are called by a FilterStack. They surround just the filter's performing.
+The Callbacks for the `:filter` action are run when single Filters are called by a Pipeline. They surround just the filter's performing.
 
 Example for the `:perform` action:
 
 ```ruby
-class ProductFilterStack < Lappen::FilterStack
+class ProductPipeline < Lappen::Pipeline
   include Lappen::Callbacks
 
   before_perform { puts 'before' }
   after_perform  { puts 'after' }
 
-  around_perform do |filter_stack, block|
+  around_perform do |pipeline, block|
     puts 'around before'
     block.call
     puts 'around after'
   end
 end
 
-ProductFilterStack.perform(scope = {})
+ProductPipeline.perform(scope = {})
 
 # before
 # around before
@@ -210,10 +210,10 @@ Callbacks are available in subclasses dynamically. Defining a Callback in a supe
 
 ### Notifications
 
-If you want to fanout `ActiveSupport::Notifications` on the performings of a Filter Stack and single Filters, include the `Lappen::Notifications` module into your Filter Stack:
+If you want to fanout `ActiveSupport::Notifications` on the performings of a Pipeline and single Filters, include the `Lappen::Notifications` module into your Pipeline:
 
 ```ruby
-class ProductFilterStack < Lappen::FilterStack
+class ProductPipeline < Lappen::Pipeline
   include Lappen::Notifications
 end
 ```
@@ -222,16 +222,16 @@ By doing so, Notification Events with the keys `'lappen.perform'` and `'lappen.f
 
 ```ruby
 ActiveSupport::Notifications.subscribe('lappen.perform') do |name, start, finish, id, payload|
-  puts payload[:filter_stack]
+  puts payload[:pipeline]
 end
 
 ActiveSupport::Notifications.subscribe('lappen.filter') do |name, start, finish, id, payload|
-  puts payload[:filter_stack]
+  puts payload[:pipeline]
   puts payload[:filter]
 end
 ```
 
-There is always a `:filter_stack` key available in the payload, returning the performing Filter Stack instance. When subscribing to `'lappen.filter'`, you can additionally access the performing Filter instance using the `:filter` key.
+There is always a `:pipeline` key available in the payload, returning the performing Pipeline instance. When subscribing to `'lappen.filter'`, you can additionally access the performing Filter instance using the `:filter` key.
 
 As `Lappen::Notifications` uses Callbacks internally, subclasses of a class that has the `Lappen::Notifications` module included will also instrument Notifications.
 
@@ -239,23 +239,23 @@ As `Lappen::Notifications` uses Callbacks internally, subclasses of a class that
 
 It can be comfortable to know which Filter applied what condition to the scope. Consider an API that, beside delivering resources, provides information about attribute filtering, pagination or included associated resources. Meta information give you exactly this.
 
-Each Filter has access to a `meta` object which is used to memorize the conditions applied to a scope by a Filter Stack's Filters. The `meta` object is a Hash that gets populated by each Filter that is run. The Equal Filter for example would do something like the following when filtering the price:
+Each Filter has access to a `meta` object which is used to memorize the conditions applied to a scope by a Pipeline's Filters. The `meta` object is a Hash that gets populated by each Filter that is run. The Equal Filter for example would do something like the following when filtering the price:
 
 ```ruby
 meta[:equal] ||= {}
 meta[:equal].merge!(price: 5000)
 ```
 
-The `meta` object is accessable as `FilterStack#meta`. Example:
+The `meta` object is accessable as `Pipeline#meta`. Example:
 
 ```ruby
-class ProductFilterStack < Lappen::FilterStack
+class ProductPipeline < Lappen::Pipeline
   use Lappen::Filters::Equal, :price
 end
 
-stack = ProductFilterStack.new(Product.all, {filter: {price: 5000}})
-stack.meta # => {}
+pipeline = ProductPipeline.new(Product.all, {filter: {price: 5000}})
+pipeline.meta # => {}
 
-products = stack.perform
-stack.meta # => {equal: {price: 5000}}
+products = pipeline.perform
+pipeline.meta # => {equal: {price: 5000}}
 ```

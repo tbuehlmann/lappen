@@ -2,13 +2,13 @@ require 'active_support/hash_with_indifferent_access'
 require 'active_support/inflector'
 
 module Lappen
-  class FilterStack
+  class Pipeline
     class << self
       def find(klass)
-        if klass.respond_to?(:filter_stack_class)
-          klass.filter_stack_class
+        if klass.respond_to?(:pipeline_class)
+          klass.pipeline_class
         else
-          "#{klass}FilterStack".constantize
+          "#{klass}Pipeline".constantize
         end
       end
 
