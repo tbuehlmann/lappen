@@ -7,11 +7,5 @@ module Lappen
         include Lappen::RequestContext::Hooks
       end
     end
-
-    initializer 'lappen.setup_active_record' do |app|
-      ActiveSupport.on_load(:active_record) do
-        extend Lappen::Scope
-      end
-    end
   end
 end

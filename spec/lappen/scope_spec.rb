@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Lappen::Scope do
-  describe '.lappen' do
+  describe '.pipeline' do
     let(:params) { double('params') }
 
     before do
@@ -19,7 +19,7 @@ describe Lappen::Scope do
 
     it 'calls #perform on the associated Lappen' do
       expect(CategoryPipeline).to receive(:perform).with(Category, params)
-      Category.lappen(params)
+      Category.pipeline(params)
     end
   end
 end

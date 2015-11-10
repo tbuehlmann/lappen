@@ -78,7 +78,17 @@ end
 
 `ProductPipeline.perform` will apply any Filter you configured in the Pipeline class on the Relation you provided as the first argument. In order to do their work, Filters get access to the `params` object you can provide as the second argument.
 
-When using ActiveRecord, all Models will get a shortcut class method for free. Having a Model `Product` with a Pipeline `ProductPipeline`, you can simply call `Product.lappen(params)`. This works internally by appending "Pipeline" to the calling Model. If you want to use the shortcut with a different Pipeline, define a class method `pipeline_class` on the Model:
+A list of built-in Filters is available in the [Wiki](https://github.com/tbuehlmann/lappen/wiki).
+
+#### Shorthand Method
+
+There's a shorthand method for finding and performing a Pipeline for a given Model or Relation. In order to enable the shorthand method, explicitly require `lappen/scope` in your Gemfile:
+
+```ruby
+gem 'lappen', github: 'tbuehlmann/lappen', require: 'lappen/scope'
+```
+
+With that, having a Model `Product` with a Pipeline `ProductPipeline`, you can simply call `Product.pipeline(params)`. This works internally by appending "Pipeline" to the calling Model. If you want to use the shorthand with a different Pipeline, define a class method `pipeline_class` on the Model:
 
 ```ruby
 class Product < ActiveRecord::Base
@@ -89,8 +99,6 @@ class Product < ActiveRecord::Base
   end
 end
 ```
-
-A list of built-in Filters is available in the [Wiki](https://github.com/tbuehlmann/lappen/wiki).
 
 ### Writing a Filter
 
