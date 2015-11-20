@@ -182,64 +182,78 @@ end
 
 ### Callbacks
 
-When including `Lappen::Callbacks` into a Pipeline, it will support (before/around/after) Callbacks in order to be able to hook into filtering actions. There are two actions to hook into: the `:perform` and the `:filter` action.
+When including `Lappen::Callbacks` into a Pipeline or Filter, it will support (before/around/after) Callbacks in order to be able to hook into its perform action.
 
-The Callbacks for the `:perform` action are run when calling `ProductPipeline.perform`. They surround the calling of all the Pipeline's Filters.
-
-The Callbacks for the `:filter` action are run when single Filters are called by a Pipeline. They surround just the filter's performing.
-
-Example for the `:perform` action:
+Example:
 
 ```ruby
 class ProductPipeline < Lappen::Pipeline
   include Lappen::Callbacks
 
-  before_perform { puts 'before' }
-  after_perform  { puts 'after' }
+  before_perform { puts 'Pipeline.before_perform' }
+  after_perform  { puts 'Pipeline.after_perform' }
 
   around_perform do |pipeline, block|
-    puts 'around before'
+    puts 'Pipeline.around_perform (before)'
     block.call
-    puts 'around after'
+    puts 'Pipeline.around_perform (after)'
+  end
+
+  use Lappen::Filters::Equal
+end
+
+class Lappen::Filters::Equal
+  include Lappen::Callbacks
+
+  before_perform { puts 'Filter.before_perform' }
+  after_perform  { puts 'Filter.after_perform' }
+
+  around_perform do |filter, block|
+    puts 'Filter.around_perform (before)'
+    block.call
+    puts 'Filter.around_perform (after)'
   end
 end
 
 ProductPipeline.perform(scope = {})
 
-# before
-# around before
-# around after
-# after
+# Pipeline.before_perform
+# Pipeline.around_perform (before)
+# Filter.before_perform
+# Filter.around_perform (before)
+# Filter.around_perform (after)
+# Filter.after_perform
+# Pipeline.around_perform (after)
+# Pipeline.after_perform
 ```
-
-In order to access the Filter currently being performed on a `:filter` action, call `filter`.
 
 Callbacks are available in subclasses dynamically. Defining a Callback in a superclass will make it available in its subclasses, even if they were already defined.
 
 ### Notifications
 
-If you want to fanout `ActiveSupport::Notifications` on the performings of a Pipeline and single Filters, include the `Lappen::Notifications` module into your Pipeline:
+If you want to fanout `ActiveSupport::Notifications` on the performings of a Pipeline or Filter, include the `Lappen::Notifications` module into your Pipeline or Filter:
 
 ```ruby
 class ProductPipeline < Lappen::Pipeline
   include Lappen::Notifications
 end
+
+class Lappen::Filters::Equal
+  include Lappen::Notifications
+end
 ```
 
-By doing so, Notification Events with the keys `'lappen.perform'` and `'lappen.filter'` will be sent. You can subscribe to these Events like this:
+By doing so, a Notification Event with the key `'lappen.pipeline.perform'` (or `'lappen.filter.perform'`) will be sent. You can subscribe to the Events like this:
 
 ```ruby
-ActiveSupport::Notifications.subscribe('lappen.perform') do |name, start, finish, id, payload|
+ActiveSupport::Notifications.subscribe('lappen.pipeline.perform') do |name, start, finish, id, payload|
   puts payload[:pipeline]
 end
 
-ActiveSupport::Notifications.subscribe('lappen.filter') do |name, start, finish, id, payload|
-  puts payload[:pipeline]
+ActiveSupport::Notifications.subscribe('lappen.filter.perform') do |name, start, finish, id, payload|
   puts payload[:filter]
 end
 ```
-
-There is always a `:pipeline` key available in the payload, returning the performing Pipeline instance. When subscribing to `'lappen.filter'`, you can additionally access the performing Filter instance using the `:filter` key.
 
 As `Lappen::Notifications` uses Callbacks internally, subclasses of a class that has the `Lappen::Notifications` module included will also instrument Notifications.
 
@@ -247,23 +261,20 @@ As `Lappen::Notifications` uses Callbacks internally, subclasses of a class that
 
 It can be comfortable to know which Filter applied what condition to the scope. Consider an API that, beside delivering resources, provides information about attribute filtering, pagination or included associated resources. Meta information give you exactly this.
 
-Each Filter has access to a `meta` object which is used to memorize the conditions applied to a scope by a Pipeline's Filters. The `meta` object is a Hash that gets populated by each Filter that is run. The Equal Filter for example would do something like the following when filtering the price:
+Each Filter has access to a `meta` object which is used to memoize the conditions applied to a scope by a Pipeline's Filters. The `meta` object is a Hash that gets populated by each Filter that is run. The Equal Filter for example would do something like the following when filtering the price:
 
 ```ruby
 meta[:equal] ||= {}
 meta[:equal].merge!(price: 5000)
 ```
 
-The `meta` object is accessable as `Pipeline#meta`. Example:
+The `meta` object is accessable as `scope.meta`. Example:
 
 ```ruby
 class ProductPipeline < Lappen::Pipeline
   use Lappen::Filters::Equal, :price
 end
 
-pipeline = ProductPipeline.new(Product.all, {filter: {price: 5000}})
-pipeline.meta # => {}
-
-products = pipeline.perform
-pipeline.meta # => {equal: {price: 5000}}
+products = ProductPipeline.perform(Product.all, {filter: {price: 5000}})
+products.meta # => {equal: {price: 5000}}
 ```

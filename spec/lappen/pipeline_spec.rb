@@ -1,33 +1,41 @@
 require 'spec_helper'
 
 describe Lappen::Pipeline do
-  subject { Class.new(described_class) }
+  before do
+    ProductPipeline = Class.new(described_class)
+  end
 
-  let(:scope)  { double('scope') }
+  after do
+    Object.send(:remove_const, :ProductPipeline)
+  end
+
+  subject { ProductPipeline }
+
+  let(:scope)  { Product.all }
   let(:params) { {} }
 
   describe '.find' do
-    let(:model) { double('model') }
-
     context 'with the argument responding to .pipeline_class' do
+      before do
+        class MyProduct < ActiveRecord::Base
+          def self.pipeline_class
+            ProductPipeline
+          end
+        end
+      end
+
+      after do
+        Object.send(:remove_const, :MyProduct)
+      end
+
       it 'returns the deposited class' do
-        allow(model).to receive(:pipeline_class) { subject }
-        expect(described_class.find(model)).to eq(subject)
+        expect(described_class.find(MyProduct)).to eq(subject)
       end
     end
 
     context 'with the argument not responding to .pipeline_class' do
-      before do
-        allow(model).to receive(:to_s) { 'Model' }
-        ModelPipeline = subject
-      end
-
-      after do
-        Object.send(:remove_const, :ModelPipeline)
-      end
-
       it 'returns class name appended with "Pipeline"' do
-        expect(described_class.find(model)).to eq(subject)
+        expect(described_class.find(Product)).to eq(subject)
       end
     end
   end
@@ -64,55 +72,33 @@ describe Lappen::Pipeline do
   end
 
   describe '#perform' do
-    let(:add_one) do
-      Class.new(Lappen::Filter) do
-        def perform(scope, params = {})
-          scope + 1
-        end
-      end
-    end
-
-    let(:add_two) do
-      Class.new(Lappen::Filter) do
-        def perform(scope, params = {})
-          scope + 2
-        end
-      end
-    end
-
     let(:halter) do
       Class.new(Lappen::Filter) do
         def perform(scope, params = {})
-          throw(:halt, 42)
+          throw(:halt, {})
         end
       end
     end
 
     it 'calls #perform on each filter from the pipeline' do
-      subject.use(add_one)
-      subject.use(add_two)
+      subject.use(Lappen::Filters::Equal)
+      subject.use(Lappen::Filters::Comparable)
 
-      expect_any_instance_of(add_one).to receive(:perform).with(0, params).once.and_call_original
-      expect_any_instance_of(add_two).to receive(:perform).with(1, params).once.and_call_original
+      expect_any_instance_of(Lappen::Filters::Equal).to receive(:perform).once.and_call_original
+      expect_any_instance_of(Lappen::Filters::Comparable).to receive(:perform).once.and_call_original
 
-      subject.perform(0, params)
-    end
-
-    it 'returns filtered scope' do
-      subject.use(add_one)
-      subject.use(add_two)
-
-      filtered_scope = subject.perform(0, params)
-      expect(filtered_scope).to eq(3)
+      subject.perform(scope, params)
     end
 
     it 'catches :halt and returns it' do
       subject.use(halter)
-      subject.use(add_one)
-      subject.use(add_two)
+      subject.use(Lappen::Filters::Equal)
 
-      filtered_scope = subject.perform(0, params)
-      expect(filtered_scope).to eq(42)
+      expect_any_instance_of(halter).to receive(:perform).once.and_call_original
+      expect_any_instance_of(Lappen::Filters::Equal).not_to receive(:perform)
+
+      filtered_scope = subject.perform(scope, params)
+      expect(filtered_scope).to eq({})
     end
   end
 end

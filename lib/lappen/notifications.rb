@@ -3,18 +3,26 @@ require 'active_support/notifications'
 
 module Lappen
   module Notifications
-    def self.included(base)
-      base.__send__(:include, Lappen::Callbacks)
+    class << self
+      def included(base)
+        base.__send__(:include, Lappen::Callbacks)
 
-      base.around_perform do |pipeline, block|
-        ActiveSupport::Notifications.instrument('lappen.perform', pipeline: pipeline) do
-          block.call
+        if base < Lappen::Pipeline
+          add_perform_callback(base, type: :pipeline)
+        elsif base < Lappen::Filter
+          add_perform_callback(base, type: :filter)
+        else
+          raise 'Lappen::Notifications could not be included, the base class has to be of kind Lappen::Pipeline or Lappen::Filter'
         end
       end
 
-      base.around_filter do |pipeline, block|
-        ActiveSupport::Notifications.instrument('lappen.filter', pipeline: pipeline, filter: pipeline.filter) do
-          block.call
+      private
+
+      def add_perform_callback(base, type:)
+        base.around_perform do |object, block|
+          ActiveSupport::Notifications.instrument("lappen.#{type}.perform", type => object) do
+            block.call
+          end
         end
       end
     end

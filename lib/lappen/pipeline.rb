@@ -1,3 +1,4 @@
+require 'lappen/meta'
 require 'active_support/hash_with_indifferent_access'
 require 'active_support/inflector'
 
@@ -29,37 +30,46 @@ module Lappen
       end
     end
 
-    attr_accessor :scope, :params, :filter
+    attr_reader :scope, :params
 
     def initialize(scope, params = {})
-      self.scope  = scope
-      self.params = ActiveSupport::HashWithIndifferentAccess.new_from_hash_copying_default(params)
+      @scope  = scope
+      @params = ActiveSupport::HashWithIndifferentAccess.new_from_hash_copying_default(params)
     end
 
     def perform
+      decorate_scope(filtered_scope)
+    end
+
+    private
+
+    def filtered_scope
+      scope = self.scope
+
       catch(:halt) do
         self.class.filters.each do |triplet|
-          self.filter = instantiate_filter(triplet)
-          self.scope = perform_filter
+          filter = instantiate_filter(triplet)
+          scope = filter.perform(scope, params)
         end
 
         scope
       end
     end
 
-    def meta
-      @meta ||= {}
-    end
-
-    private
-
-    def perform_filter
-      filter.perform(scope, params)
+    def decorate_scope(scope)
+      scope.tap do |object|
+        scope.extend(Meta)
+        scope.meta = meta
+      end
     end
 
     def instantiate_filter(triplet)
-      filter_class, args, options = triplet
-      filter_class.new(*args, **options.merge(meta: meta))
+      filter, args, options = triplet
+      filter.new(*args, **options.merge(meta: meta))
+    end
+
+    def meta
+      @meta ||= {}
     end
   end
 end

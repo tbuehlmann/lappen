@@ -13,6 +13,7 @@ RSpec.configure do |config|
   end
 
   config.after(:suite) do
+    Object.send(:remove_const, :Product)
     ActiveRecord::Base.connection.disconnect!
   end
 end

@@ -14,18 +14,12 @@ module Lappen
       def perform(*)
         run_callbacks(:perform) { super }
       end
-
-      def perform_filter(*)
-        run_callbacks(:filter) { super }
-      end
     end
 
     module ClassMethods
-      [:perform, :filter].each do |action|
-        [:before, :around, :after].each do |callback|
-          define_method "#{callback}_#{action}" do |*names, &block|
-            set_callback(action, callback, *names, &block)
-          end
+      [:before, :around, :after].each do |callback|
+        define_method "#{callback}_perform" do |*names, &block|
+          set_callback(:perform, callback, *names, &block)
         end
       end
     end

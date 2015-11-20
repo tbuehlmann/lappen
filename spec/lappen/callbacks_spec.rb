@@ -8,13 +8,11 @@ describe Lappen::Callbacks do
       end
     end
 
-    [:perform, :filter].each do |action|
-      [:before, :around, :after].each do |callback|
-        method_name = "#{callback}_#{action}"
+    [:before, :around, :after].each do |callback|
+      method_name = "#{callback}_perform"
 
-        it "adds a #{method_name} method" do
-          expect(pipeline).to respond_to(method_name)
-        end
+      it "adds a #{method_name} method" do
+        expect(pipeline).to respond_to(method_name)
       end
     end
   end
