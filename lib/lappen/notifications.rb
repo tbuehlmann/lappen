@@ -8,9 +8,9 @@ module Lappen
         base.__send__(:include, Lappen::Callbacks)
 
         if base < Lappen::Pipeline
-          add_perform_callback(base, type: :pipeline)
+          add_around_perform_callback(base, type: :pipeline)
         elsif base < Lappen::Filter
-          add_perform_callback(base, type: :filter)
+          add_around_perform_callback(base, type: :filter)
         else
           raise 'Lappen::Notifications could not be included, the base class has to be of kind Lappen::Pipeline or Lappen::Filter'
         end
@@ -18,7 +18,7 @@ module Lappen
 
       private
 
-      def add_perform_callback(base, type:)
+      def add_around_perform_callback(base, type: :pipeline)
         base.around_perform do |object, block|
           ActiveSupport::Notifications.instrument("lappen.#{type}.perform", type => object) do
             block.call
