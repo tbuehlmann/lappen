@@ -26,7 +26,7 @@ describe Lappen::Filters::Kaminari do
 
       it 'adds meta information' do
         subject.perform(scope, params)
-        expect(meta[:kaminari]).to eq(page: 5, per: 42)
+        expect(meta[:pagination]).to eq(page: 5, per: 42)
       end
     end
 
@@ -42,7 +42,7 @@ describe Lappen::Filters::Kaminari do
 
       it 'adds meta information' do
         subject.perform(scope, params)
-        expect(meta[:kaminari]).to eq(page: 5, per: 42)
+        expect(meta[:pagination]).to eq(page: 5, per: 42)
       end
     end
   end

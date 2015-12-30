@@ -20,8 +20,8 @@ module Lappen
       end
 
       def add_meta_information(page, per)
-        meta[:kaminari] ||= {}
-        meta[:kaminari].merge!(page: page, per: per)
+        meta[:pagination] ||= {}
+        meta[:pagination].merge!(page: page, per: per)
       end
     end
   end
