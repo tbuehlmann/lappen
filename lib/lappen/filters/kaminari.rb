@@ -4,7 +4,7 @@ module Lappen
       def perform(scope, params = {})
         page =    params[page_key]
         per  =    params[per_key]
-        padding = params[padding_key]
+        padding = params[padding_key].to_i
         paginated_scope = scope.public_send(page_method_name, page).per(per).padding(padding)
 
         add_meta_information(paginated_scope)
@@ -35,7 +35,7 @@ module Lappen
         meta[:pagination].merge!(
           page: scope.current_page,
           per: scope.limit_value,
-          padding: scope.instance_variable_get(:@_padding).to_i
+          padding: scope.instance_variable_get(:@_padding)
         )
       end
     end
