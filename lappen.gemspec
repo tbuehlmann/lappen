@@ -30,4 +30,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'actionpack', '~> 4.0'
   spec.add_development_dependency 'activerecord', '~> 4.0'
   spec.add_development_dependency 'sqlite3'
+  spec.add_development_dependency 'kaminari'
 end
