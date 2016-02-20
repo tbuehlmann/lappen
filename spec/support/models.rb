@@ -11,9 +11,4 @@ RSpec.configure do |config|
       create_table(:products, force: true) { |t| t.integer(:price) }
     end
   end
-
-  config.after(:suite) do
-    Object.send(:remove_const, :Product)
-    ActiveRecord::Base.connection.disconnect!
-  end
 end
