@@ -18,7 +18,7 @@ module Lappen
       end
 
       def application_pipeline_present?
-        update_autoload_paths!
+        update_autoload_paths
 
         begin
           ::ApplicationPipeline
@@ -27,7 +27,7 @@ module Lappen
         end
       end
 
-      def update_autoload_paths!
+      def update_autoload_paths
         if File.directory?(pipelines_path) && !autoload_paths.include?(pipelines_path)
           autoload_paths << pipelines_path
         end

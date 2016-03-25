@@ -1,25 +1,14 @@
 require 'spec_helper'
 
 describe Lappen::Scope do
+  before do
+    Product.extend(described_class)
+  end
+
   describe '.pipeline' do
-    let(:params) { double('params') }
-
-    before do
-      class Category < ActiveRecord::Base
-        extend Lappen::Scope
-      end
-
-      CategoryPipeline = Class.new(Lappen::Pipeline)
-    end
-
-    after do
-      Object.send(:remove_const, :Category)
-      Object.send(:remove_const, :CategoryPipeline)
-    end
-
-    it 'calls #perform on the associated Lappen' do
-      expect(CategoryPipeline).to receive(:perform).with(Category, params)
-      Category.pipeline(params)
+    it 'calls #perform on the associated Pipeline' do
+      expect(ProductPipeline).to receive(:perform).with(Product, {})
+      Product.pipeline({})
     end
   end
 end
