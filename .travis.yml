@@ -1,10 +1,22 @@
 language: ruby
+
 rvm:
   - 2.1.8
   - 2.2.4
   - 2.3.0
   - ruby-head
+
+gemfile:
+  - Gemfile
+  - gemfiles/Gemfile.rails-4.0.x
+  - gemfiles/Gemfile.rails-4.1.x
+  - gemfiles/Gemfile.rails-5.0.0.beta3
+
 matrix:
   allow_failures:
     - rvm: ruby-head
+  exclude:
+    - rvm: 2.1.8
+      gemfile: gemfiles/Gemfile.rails-5.0.0.beta3
+
 script: bin/rspec

@@ -1,6 +1,13 @@
-require 'rspec'
-require 'pry'
 require 'lappen'
+require 'pry'
+require 'pry-stack_explorer'
+
+# We need to require rails here in order to not get an
+#
+#   undefined method `env' for Rails:Module (NoMethodError)
+#
+# when Rails.env is called in 4.1.5.
+require 'rails'
 
 Dir['./spec/support/**/*.rb'].sort.each { |file| require file }
 

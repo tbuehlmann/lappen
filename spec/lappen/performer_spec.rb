@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Lappen::Performer do
+describe Lappen::Performer, pending: 'Waiting for https://github.com/rspec/rspec-mocks/pull/1068' do
   subject { described_class.new(filters, double('scope'), {}) }
   let(:filters) { [[FilterOne, [], {}], [FilterTwo, [], {}]] }
 

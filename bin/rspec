@@ -1,6 +1,4 @@
 #!/usr/bin/env ruby
 
 require 'bundler/setup'
-require 'lappen'
-
 load Gem.bin_path('rspec-core', 'rspec')

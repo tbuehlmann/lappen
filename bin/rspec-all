@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require 'yaml'
+
+YAML.load(File.read('.travis.yml'))['gemfile'].each do |gemfile|
+  puts "Running with Gemfile '#{gemfile}'"
+
+  Bundler.with_clean_env do
+    Kernel.system("BUNDLE_GEMFILE='#{gemfile}' bundle install")
+    successful = Kernel.system("BUNDLE_GEMFILE='#{gemfile}' bin/rspec")
+
+    unless successful
+      puts "Run with Gemfile '#{gemfile}' failed."
+      exit 1
+    end
+  end
+end

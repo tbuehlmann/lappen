@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'lappen/scope'
 
 describe Lappen::Scope do
   before do

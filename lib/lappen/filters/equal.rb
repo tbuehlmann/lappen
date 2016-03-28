@@ -33,8 +33,10 @@ module Lappen
       def filter_arguments(params)
         filter_arguments = filter_key ? params[filter_key] : params
 
-        if filter_arguments.kind_of?(Hash)
-          filter_arguments
+        if filter_arguments.respond_to?(:to_unsafe_hash)
+          filter_arguments.to_unsafe_hash
+        elsif filter_arguments.respond_to?(:to_hash)
+          filter_arguments.to_hash
         else
           {}
         end
