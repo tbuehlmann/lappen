@@ -16,10 +16,10 @@ Ever faced code like this? Right, me too. And I don't like it.
 
 This Library targets the problem of Relation filtering (and polluted controller index actions) by abstracting the method chaining in a Pipeline-oriented fashion.
 
-## Requirements
+## Supported Versions
 
-- Ruby  ~> 2.0
-- Rails ~> 4.0
+- Ruby 2.0, 2.1, 2.2, 2.3
+- Rails 4.0, 4.1, 4.2, 5.0 (racecar1)
 
 ## Installation
 

@@ -27,19 +27,6 @@ describe Lappen::Filters::Equal do
       end
     end
 
-    # ActiveRecord will raise an ActiveModel::ForbiddenAttributesError if
-    # the passed argument is an unpermitted instance of ActionController::Parameters.
-    context 'with ActionController::Parameters as params' do
-      let(:args)    { [:name, :status] }
-      let(:filters) { {name: 'foo', status: 42} }
-      let(:params)  { ActionController::Parameters.new(filter: filters) }
-
-      it 'calls .where with a Hash, not with ActionController::Parameters' do
-        expect(scope).to receive(:where).with(instance_of(Hash))
-        subject.perform(scope, params)
-      end
-    end
-
     context 'without a configured filterable attribute' do
       let(:args)   { [] }
       let(:params) { {filter: {name: 'foo'}}.with_indifferent_access }

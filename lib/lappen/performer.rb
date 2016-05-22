@@ -1,5 +1,5 @@
 require 'lappen/meta'
-require 'active_support/core_ext/hash/indifferent_access'
+require 'active_support/hash_with_indifferent_access'
 
 module Lappen
   class Performer
@@ -11,9 +11,14 @@ module Lappen
 
     def initialize(filters, scope, params)
       @filters = filters
-      @scope   = scope
-      @params  = params.with_indifferent_access
-      @meta    = {}.with_indifferent_access
+      @scope = scope
+      @meta = {}.with_indifferent_access
+
+      @params = if params.respond_to?(:to_unsafe_hash)
+        params.to_unsafe_hash.with_indifferent_access
+      else
+        params.to_hash.with_indifferent_access
+      end
     end
 
     def perform
