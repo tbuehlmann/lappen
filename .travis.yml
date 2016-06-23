@@ -11,15 +11,15 @@ gemfile:
   - Gemfile
   - gemfiles/Gemfile.rails-4.0.x
   - gemfiles/Gemfile.rails-4.1.x
-  - gemfiles/Gemfile.rails-5.0.0.racecar1
+  - gemfiles/Gemfile.rails-5.0.0.rc2
 
 matrix:
   allow_failures:
     - rvm: ruby-head
   exclude:
     - rvm: 2.0.0
-      gemfile: gemfiles/Gemfile.rails-5.0.0.racecar1
+      gemfile: gemfiles/Gemfile.rails-5.0.0.rc2
     - rvm: 2.1.8
-      gemfile: gemfiles/Gemfile.rails-5.0.0.racecar1
+      gemfile: gemfiles/Gemfile.rails-5.0.0.rc2
 
 script: bin/rspec

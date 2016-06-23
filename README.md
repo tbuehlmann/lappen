@@ -19,7 +19,7 @@ This Library targets the problem of Relation filtering (and polluted controller 
 ## Supported Versions
 
 - Ruby 2.0, 2.1, 2.2, 2.3
-- Rails 4.0, 4.1, 4.2, 5.0 (racecar1)
+- Rails 4.0, 4.1, 4.2, 5.0 (rc2)
 
 ## Installation
 
