@@ -3,7 +3,6 @@ language: ruby
 rvm:
   - 2.3.0
   - 2.2.4
-  - 2.1.8
   - ruby-head
 
 gemfile:
@@ -15,8 +14,5 @@ gemfile:
 matrix:
   allow_failures:
     - rvm: ruby-head
-  exclude:
-    - rvm: 2.1.8
-      gemfile: gemfiles/Gemfile
 
 script: bin/rspec
