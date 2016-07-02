@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Lappen::Performer, pending: 'Waiting for RSpec 3.5.0' do
+describe Lappen::Performer do
   subject { described_class.new(filters, double('scope'), {}) }
   let(:filters) { [[FilterOne, [], {}], [FilterTwo, [], {}]] }
 
