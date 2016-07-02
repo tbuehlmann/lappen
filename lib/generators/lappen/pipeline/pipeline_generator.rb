@@ -34,11 +34,11 @@ module Lappen
       end
 
       def autoload_paths
-        @autoload_paths ||= ActiveSupport::Dependencies.autoload_paths
+        ActiveSupport::Dependencies.autoload_paths
       end
 
       def pipelines_path
-        @pipelines_path ||= Rails.root.join('app', 'pipelines').to_s
+        Rails.root.join('app', 'pipelines').to_s
       end
     end
   end

@@ -1,14 +1,14 @@
 require 'spec_helper'
 require 'action_controller'
 
-describe Lappen::RequestContext::Hooks do
+describe Lappen::RequestContext::Callbacks do
   let(:controller_class) { Class.new(ActionController::Base) }
   let(:controller)       { controller_class.new }
   let(:view_context)     { double('view_context') }
 
   describe 'memoize_context' do
     before do
-      controller_class.send(:include, described_class)
+      controller_class.include(described_class)
       allow(controller).to receive(:view_context) { view_context }
     end
 
@@ -16,7 +16,7 @@ describe Lappen::RequestContext::Hooks do
       expect(Lappen::RequestContext).to receive(:controller=).with(controller)
       expect(Lappen::RequestContext).to receive(:view_context=).with(view_context)
 
-      controller.send(:memoize_context)
+      controller.send(:lappen_memoize_context)
     end
   end
 end

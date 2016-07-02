@@ -5,7 +5,7 @@ require 'lappen/filters'
 require 'lappen/notifications'
 require 'lappen/railtie'
 require 'lappen/request_context'
-require 'lappen/request_context/hooks'
+require 'lappen/request_context/callbacks'
 require 'lappen/version'
 
 module Lappen

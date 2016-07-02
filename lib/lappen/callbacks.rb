@@ -3,9 +3,9 @@ require 'active_support/callbacks'
 module Lappen
   module Callbacks
     def self.included(base)
-      base.__send__(:include, ActiveSupport::Callbacks)
-      base.__send__(:prepend, InstanceMethods)
-      base.__send__(:extend,  ClassMethods)
+      base.include(ActiveSupport::Callbacks)
+      base.prepend(InstanceMethods)
+      base.extend(ClassMethods)
 
       base.define_callbacks(:perform, :filter)
     end

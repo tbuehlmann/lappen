@@ -2,16 +2,16 @@ require 'active_support/concern'
 
 module Lappen
   module RequestContext
-    module Hooks
+    module Callbacks
       extend ActiveSupport::Concern
 
       included do
-        before_action :memoize_context
+        before_action :lappen_memoize_context
       end
 
       private
 
-      def memoize_context
+      def lappen_memoize_context
         Lappen::RequestContext.controller   = self
         Lappen::RequestContext.view_context = view_context
       end

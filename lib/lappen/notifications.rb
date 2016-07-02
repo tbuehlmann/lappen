@@ -5,7 +5,7 @@ module Lappen
   module Notifications
     class << self
       def included(base)
-        base.__send__(:include, Lappen::Callbacks)
+        base.include(Lappen::Callbacks)
 
         if base < Lappen::Pipeline
           add_around_perform_callback(base, type: :pipeline)
