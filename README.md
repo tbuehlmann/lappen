@@ -88,10 +88,10 @@ There's a shorthand method for finding and performing a Pipeline for a given Mod
 gem 'lappen', github: 'tbuehlmann/lappen', require: 'lappen/scope'
 ```
 
-With that, having a Model `Product` with a Pipeline `ProductPipeline`, you can simply call `Product.pipeline(params)`. This works internally by appending "Pipeline" to the calling Model. If you want to use the shorthand with a different Pipeline, define a class method `pipeline_class` on the Model:
+With that, having a Model `Product` with a Pipeline `ProductPipeline`, you can simply call `Product.pipeline(params)`. This works internally by appending "Pipeline" to the calling Model's name. If you want to use the shorthand with a different Pipeline, define a class method `pipeline_class` on the Model:
 
 ```ruby
-class Product < ActiveRecord::Base
+class Product < ApplicationRecord
   class << self
     def pipeline_class
       MyProductPipeline
