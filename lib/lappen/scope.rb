@@ -10,13 +10,11 @@ module Lappen
   end
 
   class Railtie < Rails::Railtie
-    initializer 'lappen.setup_active_record' do |app|
-      ActiveSupport.on_load(:active_record) do
-        begin
-          ::ApplicationRecord.extend(Lappen::Scope)
-        rescue NameError
-          extend Lappen::Scope
-        end
+    config.to_prepare do
+      begin
+        ApplicationRecord.extend(Lappen::Scope)
+      rescue NameError
+        ActiveRecord::Base.extend(Lappen::Scope)
       end
     end
   end
