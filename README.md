@@ -100,6 +100,8 @@ class Product < ApplicationRecord
 end
 ```
 
+The `pipeline` method is defined on `ApplicationRecord` if existing or `ActiveRecord::Base` otherwise.
+
 ### Writing a Filter
 
 If you want to write and use your own Filter, create a class following the common interface:
